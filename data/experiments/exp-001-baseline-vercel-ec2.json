@@ -1,0 +1,25 @@
+{
+	  "id": "exp-001-baseline-vercel-ec2",
+	    "title": "Vercel + Supabase + EC2 구조 baseline 및 부하 테스트",
+	      "hypothesis": "현재 구조에서 일정 수준의 트래픽까지는 안정적으로 처리 가능할 것이다",
+	        "status": "completed",
+		  "validation": "partial",
+		    "result_metrics": {
+			        "baseline_avg_s": 1.27,
+				    "baseline_p95_s": 1.56,
+				        "max_vus_tested": 100,
+					    "cpu_peak_percent": 99,
+					        "error_rate_peak": 0.05
+						  },
+						    "primary_metric_name": "cpu_peak_percent",
+						      "primary_metric_value": 99,
+						        "conclusion": "현재 구조는 낮은 부하에서는 안정적이나, 단일 worker 기반 처리 구조로 인해 일정 부하 이상에서 병목이 발생하며 시스템이 안정적으로 동작하지 못함",
+							  "problem_found": "AI 요청이 단일 EC2 worker에 집중되며 병렬 처리 한계로 인해 CPU 사용률이 급격히 상승하고, 일정 부하 이상에서 인스턴스가 응답 불가 상태에 도달함",
+							    "improvement": "요청 처리를 비동기화하기 위해 Queue 도입 필요",
+							      "github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-001-baseline-vercel-ec2",
+							        "diagram_url": null,
+								  "arch_version": "v1.0",
+								    "tags": ["baseline", "ec2", "vercel", "supabase", "k6", "bottleneck"],
+								      "started_at": "2026-05-20",
+								        "ended_at": "2026-05-22"
+}

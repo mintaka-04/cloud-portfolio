@@ -18,7 +18,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9"
   },
-  "type": "module",
   "scripts": {
 	"dev": "next dev --turbopack",
 	"build": "next build",

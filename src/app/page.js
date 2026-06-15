@@ -3,15 +3,28 @@
 import { useState, useEffect } from 'react';
 
 // ── Color System ──────────────────────────────────────
+
+
+// const C = {
+//   bg:          "#222831", // 전체 배경, 가장 어두운 톤
+//   surface:     "#31363F", // 카드/섹션 배경
+//   surfaceDeep: "#1A1F24", // 추가: 더 깊은 다크톤, 헤더/푸터용
+//   border:      "#4A525A", // 추가: 중간 톤 그레이, 구분선
+//   muted:       "#76ABAE", // 보조 텍스트/아이콘, 청록 포인트
+//   soft:        "#5F8F92", // 추가: 버튼 hover, 강조 배경
+//   light:       "#EEEEEE", // 본문 텍스트, 대비용 밝은 색
+// };
+
 const C = {
-  bg:          "#3A606E",
-  surface:     "#607B7D",
-  surfaceDeep: "#4E6870",
-  border:      "#828E82",
-  muted:       "#828E82",
-  soft:        "#AAAE8E",
-  light:       "#E0E0E0",
+  bg:          "#222831", // 전체 배경, 가장 어두운 톤
+  surface:     "#393E46", // 카드/섹션 배경
+  surfaceDeep: "#181C20", // 추가: 더 깊은 다크톤, 헤더/푸터용
+  border:      "#5A5F66", // 추가: 중간 톤 그레이, 구분선
+  muted:       "#948979", // 보조 텍스트/아이콘, 따뜻한 그레이브라운
+  soft:        "#B0A58F", // 추가: 버튼 hover, 강조 배경
+  light:       "#DFD0B8", // 본문 텍스트, 대비용 밝은 색
 };
+
 
 // ── Sample Data ────────────────────────────────────────
 const initExperiments = [
@@ -158,15 +171,15 @@ const Input = ({ label, value, onChange, type="text", options, hint }) => (
       {label}{hint&&<span style={{ color:C.border, fontSize:11, marginLeft:6 }}>{hint}</span>}
     </label>
     {options ? (
-      <select value={value ?? ''} onChange={e=>onChange(e.target.value)}
+      <select value={value} onChange={e=>onChange(e.target.value)}
         style={{ width:"100%", background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, padding:"6px 10px", color:C.soft, fontSize:13 }}>
         {options.map(o=><option key={o} value={o}>{o}</option>)}
       </select>
     ) : type==="textarea" ? (
-      <textarea value={value ?? ''} onChange={e=>onChange(e.target.value)} rows={4}
+      <textarea value={value} onChange={e=>onChange(e.target.value)} rows={4}
         style={{ width:"100%", background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, padding:"6px 10px", color:C.soft, fontSize:13, resize:"vertical", boxSizing:"border-box", fontFamily:"inherit", lineHeight:1.6 }} />
     ) : (
-      <input type={type} value={value ?? ''} onChange={e=>onChange(e.target.value)}
+      <input type={type} value={value} onChange={e=>onChange(e.target.value)}
         style={{ width:"100%", background:C.bg, border:`1px solid ${C.border}`, borderRadius:4, padding:"6px 10px", color:C.soft, fontSize:13, boxSizing:"border-box" }} />
     )}
   </div>
@@ -348,9 +361,8 @@ function Dashboard({ experiments, architectures, perfs, incidents, nav }) {
 function ExperimentList({ experiments, nav, setEditItem }) {
   return (
     <div>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+      <div style={{ marginBottom:20 }}>
         <h2 style={{ color:C.light, fontSize:18, margin:0 }}>Experiments</h2>
-        <Btn onClick={()=>{ setEditItem(null); nav("exp-form"); }}>+ New Experiment</Btn>
       </div>
       {experiments.map(e=>(
         <Card key={e.id} style={{ marginBottom:12 }} onClick={()=>nav("exp-detail",e.id)}>
@@ -381,8 +393,6 @@ function ExperimentDetail({ exp, architectures, perfs, incidents, nav, setEditIt
     <div>
       <div style={{ display:"flex", gap:8, marginBottom:12, flexWrap:"wrap" }}>
         <Btn variant="ghost" small onClick={()=>nav("experiments")}>← 목록</Btn>
-        <Btn variant="ghost" small onClick={()=>{ setEditItem(exp); nav("exp-form"); }}>편집</Btn>
-        <Btn variant="danger" small onClick={()=>{ onDelete(exp.id); nav("experiments"); }}>삭제</Btn>
       </div>
       <RelatedBar items={related} nav={nav} />
       <Card>
@@ -406,7 +416,7 @@ function ExperimentForm({ initial, onSave, nav, architectures, perfs, incidents 
   const [tab, setTab] = useState("overview");
   const f = k=>v=>setForm(p=>({...p,[k]:v}));
   const toggleId = (key,id) => setForm(p=>({...p,[key]:p[key].includes(id)?p[key].filter(x=>x!==id):[...p[key],id]}));
-  const save = () => { if(!form.title) return alert("title은 필수입니다."); onSave({...form,_savedId: form.id}); nav("experiments"); };
+  const save = () => { if(!form.title) return alert("title은 필수입니다."); onSave({...form,id:form.id||crypto.randomUUID()}); nav("experiments"); };
   return (
     <div>
       <div style={{ display:"flex", gap:8, marginBottom:20 }}><Btn variant="ghost" small onClick={()=>nav("experiments")}>← 취소</Btn><h2 style={{ color:C.light, fontSize:18, margin:0 }}>{form.id?"편집":"New Experiment"}</h2></div>
@@ -444,9 +454,8 @@ function ExperimentForm({ initial, onSave, nav, architectures, perfs, incidents 
 function ArchList({ architectures, nav, setEditItem }) {
   return (
     <div>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+      <div style={{ marginBottom:20 }}>
         <h2 style={{ color:C.light, fontSize:18, margin:0 }}>Architecture History</h2>
-        <Btn onClick={()=>{ setEditItem(null); nav("arch-form"); }}>+ New Version</Btn>
       </div>
       {[...architectures].sort((a,b)=>b.date.localeCompare(a.date)).map((a,i)=>(
         <div key={a.id} style={{ paddingLeft:16, position:"relative", marginBottom:4 }}>
@@ -481,8 +490,6 @@ function ArchDetail({ item, experiments, perfs, incidents, nav, setEditItem, onD
     <div>
       <div style={{ display:"flex", gap:8, marginBottom:12 }}>
         <Btn variant="ghost" small onClick={()=>nav("architecture")}>← 목록</Btn>
-        <Btn variant="ghost" small onClick={()=>{ setEditItem(item); nav("arch-form"); }}>편집</Btn>
-        <Btn variant="danger" small onClick={()=>{ onDelete(item.id); nav("architecture"); }}>삭제</Btn>
       </div>
       <RelatedBar items={related} nav={nav} />
       <Card>
@@ -505,7 +512,7 @@ function ArchForm({ initial, onSave, nav }) {
   const [form, setForm] = useState(initial||{ version:"", title:"", date:new Date().toISOString().slice(0,10), change_type:"major", background:"", alternatives:"", tech_rationale:"", before:"", after:"", components:"", expected:"", actual:"", tags:"" });
   const [tab, setTab] = useState("why");
   const f = k=>v=>setForm(p=>({...p,[k]:v}));
-  const save = () => { if(!form.version||!form.title) return alert("version, title은 필수입니다."); onSave({...form,_savedId: form.id,tags:typeof form.tags==="string"?form.tags.split(",").map(t=>t.trim()).filter(Boolean):form.tags}); nav("architecture"); };
+  const save = () => { if(!form.version||!form.title) return alert("version, title은 필수입니다."); onSave({...form,id:form.id||crypto.randomUUID(),tags:typeof form.tags==="string"?form.tags.split(",").map(t=>t.trim()).filter(Boolean):form.tags}); nav("architecture"); };
   return (
     <div>
       <div style={{ display:"flex", gap:8, marginBottom:20 }}><Btn variant="ghost" small onClick={()=>nav("architecture")}>← 취소</Btn><h2 style={{ color:C.light, fontSize:18, margin:0 }}>{form.id?"편집":"New Architecture Version"}</h2></div>
@@ -530,9 +537,8 @@ function ArchForm({ initial, onSave, nav }) {
 function PerfList({ perfs, nav, setEditItem }) {
   return (
     <div>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+      <div style={{ marginBottom:20 }}>
         <h2 style={{ color:C.light, fontSize:18, margin:0 }}>Performance</h2>
-        <Btn onClick={()=>{ setEditItem(null); nav("perf-form"); }}>+ New</Btn>
       </div>
       {perfs.map(p=>(
         <Card key={p.id} style={{ marginBottom:12 }} onClick={()=>nav("perf-detail",p.id)}>
@@ -559,8 +565,6 @@ function PerfDetail({ item, experiments, architectures, incidents, nav, setEditI
     <div>
       <div style={{ display:"flex", gap:8, marginBottom:12 }}>
         <Btn variant="ghost" small onClick={()=>nav("performance")}>← 목록</Btn>
-        <Btn variant="ghost" small onClick={()=>{ setEditItem(item); nav("perf-form"); }}>편집</Btn>
-        <Btn variant="danger" small onClick={()=>{ onDelete(item.id); nav("performance"); }}>삭제</Btn>
       </div>
       <RelatedBar items={related} nav={nav} />
       <Card>
@@ -584,7 +588,7 @@ function PerfDetail({ item, experiments, architectures, incidents, nav, setEditI
 function PerfForm({ initial, onSave, nav }) {
   const [form, setForm] = useState(initial||{ title:"", date:new Date().toISOString().slice(0,10), tools:"", environment:"staging", summary:"", metrics_snapshot:"", notes:"" });
   const f = k=>v=>setForm(p=>({...p,[k]:v}));
-  const save = () => { if(!form.title) return alert("title은 필수입니다."); onSave({...form,_savedId: form.id}); nav("performance"); };
+  const save = () => { if(!form.title) return alert("title은 필수입니다."); onSave({...form,id:form.id||crypto.randomUUID()}); nav("performance"); };
   return (
     <div>
       <div style={{ display:"flex", gap:8, marginBottom:20 }}><Btn variant="ghost" small onClick={()=>nav("performance")}>← 취소</Btn><h2 style={{ color:C.light, fontSize:18, margin:0 }}>{form.id?"편집":"New Performance Record"}</h2></div>
@@ -608,9 +612,8 @@ function PerfForm({ initial, onSave, nav }) {
 function IncidentList({ incidents, nav, setEditItem }) {
   return (
     <div>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+      <div style={{ marginBottom:20 }}>
         <h2 style={{ color:C.light, fontSize:18, margin:0 }}>Incidents</h2>
-        <Btn onClick={()=>{ setEditItem(null); nav("inc-form"); }}>+ New Incident</Btn>
       </div>
       {incidents.map(i=>(
         <Card key={i.id} style={{ marginBottom:12 }} onClick={()=>nav("inc-detail",i.id)}>
@@ -640,8 +643,6 @@ function IncidentDetail({ item, experiments, architectures, perfs, nav, setEditI
     <div>
       <div style={{ display:"flex", gap:8, marginBottom:12 }}>
         <Btn variant="ghost" small onClick={()=>nav("incidents")}>← 목록</Btn>
-        <Btn variant="ghost" small onClick={()=>{ setEditItem(item); nav("inc-form"); }}>편집</Btn>
-        <Btn variant="danger" small onClick={()=>{ onDelete(item.id); nav("incidents"); }}>삭제</Btn>
       </div>
       <RelatedBar items={related} nav={nav} />
       <Card>
@@ -669,7 +670,7 @@ function IncidentDetail({ item, experiments, architectures, perfs, nav, setEditI
 function IncidentForm({ initial, onSave, nav }) {
   const [form, setForm] = useState(initial||{ title:"", severity:"high", status:"open", detected_at:new Date().toISOString().slice(0,16), resolved_at:"", affected:"", how_detected:"", root_cause:"", resolution:"" });
   const f = k=>v=>setForm(p=>({...p,[k]:v}));
-  const save = () => { if(!form.title) return alert("title은 필수입니다."); onSave({...form,_savedId: form.id}); nav("incidents"); };
+  const save = () => { if(!form.title) return alert("title은 필수입니다."); onSave({...form,id:form.id||crypto.randomUUID()}); nav("incidents"); };
   return (
     <div>
       <div style={{ display:"flex", gap:8, marginBottom:20 }}><Btn variant="ghost" small onClick={()=>nav("incidents")}>← 취소</Btn><h2 style={{ color:C.light, fontSize:18, margin:0 }}>{form.id?"편집":"New Incident"}</h2></div>
@@ -696,48 +697,14 @@ export default function App() {
   const [page, setPage]         = useState("dashboard");
   const [detailId, setDetailId] = useState(null);
   const [editItem, setEditItem] = useState(null);
-  const [experiments,   setExperiments]   = useState([]);
-  const [architectures, setArchitectures] = useState([]);
-  const [perfs,         setPerfs]         = useState([]);
-  const [incidents,     setIncidents]     = useState([]);
-  const [loading,       setLoading]       = useState(true);
-
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/experiments').then(r=>r.json()),
-      fetch('/api/architectures').then(r=>r.json()),
-      fetch('/api/performances').then(r=>r.json()),
-      fetch('/api/incidents').then(r=>r.json()),
-    ]).then(([exps, archs, perfs, incs]) => {
-      setExperiments(exps);
-      setArchitectures(archs);
-      setPerfs(perfs);
-      setIncidents(incs);
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading) return <div style={{ color:C.light, padding:40 }}>Loading...</div>;
+  const [experiments,   setExperiments]   = useState(initExperiments);
+  const [architectures, setArchitectures] = useState(initArchitectures);
+  const [perfs,         setPerfs]         = useState(initPerfs);
+  const [incidents,     setIncidents]     = useState(initIncidents);
 
   const nav    = (p,id=null) => { setPage(p); setDetailId(id); };
-  const apiUpsert = (endpoint, setter) => async (item) => {
-    const isNew = !item._savedId;
-    const url = isNew ? `/api/${endpoint}` : `/api/${endpoint}/${item._savedId}`;
-    const method = isNew ? 'POST' : 'PUT';
-    const { _savedId, ...body } = item;
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const saved = await res.json();
-    setter(prev => prev.some(x=>x.id===saved.id) ? prev.map(x=>x.id===saved.id?saved:x) : [...prev, saved]);
-  };
-
-  const apiDel = (endpoint, setter) => async (id) => {
-    await fetch(`/api/${endpoint}/${id}`, { method: 'DELETE' });
-    setter(prev => prev.filter(x=>x.id!==id));
-  };
+  const upsert = setter => item => setter(prev=>prev.some(x=>x.id===item.id)?prev.map(x=>x.id===item.id?item:x):[...prev,item]);
+  const del    = setter => id   => setter(prev=>prev.filter(x=>x.id!==id));
   const find   = (list,id) => list.find(x=>x.id===id);
   const main   = page.split("-")[0];
   const isExp  = ["exp","experiments"].includes(main);
@@ -745,7 +712,7 @@ export default function App() {
   return (
     <div style={{ minHeight:"100vh", background:C.bg, color:C.soft, fontFamily:"system-ui, sans-serif" }}>
       <nav style={{ background:C.surface, borderBottom:`1px solid ${C.border}`, padding:"0 24px", display:"flex", alignItems:"center", gap:4, height:48 }}>
-        <span style={{ color:C.light, fontWeight:700, fontSize:14, marginRight:16, letterSpacing:1 }}>SOD</span>
+        <span style={{ color:C.light, fontWeight:700, fontSize:14, marginRight:16, letterSpacing:1 }}>여기에 뭐넣지</span>
         {NAV.map(n=>{ const a=main===n.id||(n.id==="experiments"&&isExp); return (
           <button key={n.id} onClick={()=>nav(n.id)} style={{ background:"none", border:"none", color:a?C.light:C.muted, padding:"0 12px", height:48, cursor:"pointer", fontSize:13, fontWeight:a?600:400, borderBottom:a?`2px solid ${C.light}`:"2px solid transparent" }}>{n.label}</button>
         );})}
@@ -753,17 +720,17 @@ export default function App() {
       <main style={{ maxWidth:900, margin:"0 auto", padding:24 }}>
         {page==="dashboard"    && <Dashboard experiments={experiments} architectures={architectures} perfs={perfs} incidents={incidents} nav={nav} />}
         {page==="experiments"  && <ExperimentList experiments={experiments} nav={nav} setEditItem={setEditItem} />}
-        {page==="exp-detail"   && <ExperimentDetail exp={find(experiments,detailId)} architectures={architectures} perfs={perfs} incidents={incidents} nav={nav} setEditItem={setEditItem} onDelete={apiDel('experiments', setExperiments)} />}
-        {page==="exp-form"     && <ExperimentForm initial={editItem} onSave={apiUpsert('experiments', setExperiments)} nav={nav} architectures={architectures} perfs={perfs} incidents={incidents} />}
+        {page==="exp-detail"   && <ExperimentDetail exp={find(experiments,detailId)} architectures={architectures} perfs={perfs} incidents={incidents} nav={nav} setEditItem={setEditItem} onDelete={del(setExperiments)} />}
+        {page==="exp-form"     && <ExperimentForm initial={editItem} onSave={upsert(setExperiments)} nav={nav} architectures={architectures} perfs={perfs} incidents={incidents} />}
         {page==="architecture" && <ArchList architectures={architectures} nav={nav} setEditItem={setEditItem} />}
-        {page==="arch-detail"  && <ArchDetail item={find(architectures,detailId)} experiments={experiments} perfs={perfs} incidents={incidents} nav={nav} setEditItem={setEditItem} onDelete={apiDel('architectures', setArchitectures)} />}
-        {page==="arch-form"    && <ArchForm initial={editItem} onSave={apiUpsert('architectures', setArchitectures)} nav={nav} />}
+        {page==="arch-detail"  && <ArchDetail item={find(architectures,detailId)} experiments={experiments} perfs={perfs} incidents={incidents} nav={nav} setEditItem={setEditItem} onDelete={del(setArchitectures)} />}
+        {page==="arch-form"    && <ArchForm initial={editItem} onSave={upsert(setArchitectures)} nav={nav} />}
         {page==="performance"  && <PerfList perfs={perfs} nav={nav} setEditItem={setEditItem} />}
-        {page==="perf-detail"  && <PerfDetail item={find(perfs,detailId)} experiments={experiments} architectures={architectures} incidents={incidents} nav={nav} setEditItem={setEditItem} onDelete={apiDel('performances', setPerfs)} />}
-        {page==="perf-form"    && <PerfForm initial={editItem} onSave={apiUpsert('performances', setPerfs)} nav={nav} />}
+        {page==="perf-detail"  && <PerfDetail item={find(perfs,detailId)} experiments={experiments} architectures={architectures} incidents={incidents} nav={nav} setEditItem={setEditItem} onDelete={del(setPerfs)} />}
+        {page==="perf-form"    && <PerfForm initial={editItem} onSave={upsert(setPerfs)} nav={nav} />}
         {page==="incidents"    && <IncidentList incidents={incidents} nav={nav} setEditItem={setEditItem} />}
-        {page==="inc-detail"   && <IncidentDetail item={find(incidents,detailId)} experiments={experiments} architectures={architectures} perfs={perfs} nav={nav} setEditItem={setEditItem} onDelete={apiDel('incidents', setIncidents)} />}
-        {page==="inc-form"     && <IncidentForm initial={editItem} onSave={apiUpsert('incidents', setIncidents)} nav={nav} />}
+        {page==="inc-detail"   && <IncidentDetail item={find(incidents,detailId)} experiments={experiments} architectures={architectures} perfs={perfs} nav={nav} setEditItem={setEditItem} onDelete={del(setIncidents)} />}
+        {page==="inc-form"     && <IncidentForm initial={editItem} onSave={upsert(setIncidents)} nav={nav} />}
       </main>
     </div>
   );
