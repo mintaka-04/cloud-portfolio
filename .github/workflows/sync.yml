@@ -1,26 +1,26 @@
 name: Sync Experiments to DB
 
 on:
-    push:
-          branches:
-                  - main
-                      paths:
-                              - 'data/experiments/**.json'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/experiments/**.json'
 
-                      jobs:
-                          sync:
-                                runs-on: ubuntu-latest
-                                    steps:
-                                            - uses: actions/checkout@v4
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-                                                  - uses: actions/setup-node@v4
-                                                          with:
-                                                                      node-version: '22'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-                                                                            - name: Install dependencies
-                                                                                    run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-                                                                                          - name: Sync experiments to DB
-                                                                                                  run: node scripts/sync-experiments.js
-                                                                                                          env:
-                                                                                                                      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Sync experiments to DB
+        run: node scripts/sync-experiments.js
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
