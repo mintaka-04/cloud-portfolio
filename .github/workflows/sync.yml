@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'data/experiments/**.json'
+  workflow_dispatch:
 
 jobs:
   sync:
