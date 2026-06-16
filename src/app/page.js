@@ -103,6 +103,7 @@ function ExpCard({ exp, onClick }) {
 // ── Experiment Detail ──────────────────────────────────
 function ExpDetail({ exp, onBack }) {
   const [expanded, setExpanded] = useState(false);
+  const [imgZoom, setImgZoom] = useState(false);
   const vm = vMeta(exp.validation);
   const raw = exp.result_metrics;
   const metrics = raw
@@ -139,7 +140,16 @@ function ExpDetail({ exp, onBack }) {
           <div style={{ marginBottom: 16 }}>
             <SLabel>다이어그램</SLabel>
             {exp.diagram_url
-              ? <img src={exp.diagram_url} alt="diagram" style={{ width: "100%", borderRadius: 6, border: `1px solid ${C.border}` }} />
+              ? <>
+                {imgZoom && (
+                  <div onClick={() => setImgZoom(false)}
+                    style={{ position: "fixed", inset: 0, background: "#000000cc", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", cursor: "zoom-out" }}>
+                    <img src={exp.diagram_url} alt="diagram" style={{ maxWidth: "90vw", maxHeight: "90vh", borderRadius: 8 }} />
+                  </div>
+                )}
+                <img src={exp.diagram_url} alt="diagram" onClick={e => { e.stopPropagation(); setImgZoom(true); }}
+                  style={{ width: "100%", borderRadius: 6, border: `1px solid ${C.border}`, cursor: "zoom-in" }} />
+              </>
               : <div style={{ width: "100%", height: 180, borderRadius: 6, border: `1px dashed ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <span style={{ color: C.muted, fontSize: 13 }}>다이어그램 준비 중</span>
                 </div>
