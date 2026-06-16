@@ -113,7 +113,7 @@
 - 에러율 0%
 - CPU :
 
-![image.png](image.png)
+![image.png](images/image.png)
 
 - 테스트 과정에서 80 ~ 100 VU 구간에서 EC2 인스턴스의 CPU 사용률이 99%에 도달한 이후, SSM 접속이 불가능한 상태가 발생.
 - 과부하 시점에 인스턴스 접속이 불가능해 상세 로그 확인 어려움 → cloudwatch 지표와 supabase의 created_At 컬럼 기준으로 분석.

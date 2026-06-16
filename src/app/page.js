@@ -111,6 +111,8 @@ function MarkdownView({ url }) {
     .replace('/tree/', '/')
     + '/README.md';
 
+    const baseUrl = `https://raw.githubusercontent.com/mintaka-04/cloud-portfolio/main/experiments/${url.split('/').slice(-1)[0]}/`;
+
   const load = (e) => {
     e.stopPropagation();
     if (!open && !md) {
@@ -129,7 +131,11 @@ function MarkdownView({ url }) {
       </div>
       {open && md && (
         <div style={{ padding: "0 24px 24px", color: C.light, fontSize: 14, lineHeight: 1.8, borderTop: `1px solid ${C.border}` }}>
-          <ReactMarkdown>{md}</ReactMarkdown>
+          <ReactMarkdown
+            urlTransform={(u) => u.startsWith('http') ? u : baseUrl + u}
+          >
+            {md}
+          </ReactMarkdown>
         </div>
       )}
       {open && !md && (
