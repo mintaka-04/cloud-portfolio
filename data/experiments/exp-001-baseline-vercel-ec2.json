@@ -17,7 +17,7 @@
 							  "problem_found": "AI 요청이 단일 EC2 worker에 집중되며 병렬 처리 한계로 인해 CPU 사용률이 급격히 상승하고, 일정 부하 이상에서 인스턴스가 응답 불가 상태에 도달함",
 							    "improvement": "요청 처리를 비동기화하기 위해 Queue 도입 필요",
 							      "github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-001-baseline-vercel-ec2",
-							        "diagram_url": null,
+							        "diagram_url": "https://raw.githubusercontent.com/mintaka-04/cloud-portfolio/main/diagrams/v1-diagram-vercel-ec2.png",
 								  "arch_version": "v1.0",
 								    "tags": ["baseline", "ec2", "vercel", "supabase", "k6", "bottleneck"],
 								      "started_at": "2026-05-20",
