@@ -226,7 +226,7 @@ function ExpDetail({ exp, onBack }) {
               <div key={k} style={{ background: C.surfaceDeep, borderRadius: 6, padding: "8px 16px" }}>
                 <div style={{ color: C.muted, fontSize: 10, marginBottom: 2 }}>{k}</div>
                 <div style={{ color: k === exp.primary_metric_name ? vm.color : C.light, fontSize: 16, fontWeight: 700 }}>
-                  {typeof v === "number" ? v.toLocaleString() : v}
+                  {typeof v === "boolean" ? (v ? "✓" : "✗") : v}
                 </div>
               </div>
             ))}
