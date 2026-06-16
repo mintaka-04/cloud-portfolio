@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // const C = {
 //   bg:          "#222831", // 전체 배경, 가장 어두운 톤
@@ -132,7 +133,22 @@ function MarkdownView({ url }) {
       {open && md && (
         <div style={{ padding: "0 24px 24px", color: C.light, fontSize: 14, lineHeight: 1.8, borderTop: `1px solid ${C.border}` }}>
           <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             urlTransform={(u) => u.startsWith('http') ? u : baseUrl + u}
+            components={{
+              img: ({ src, alt }) => (
+                <img src={src} alt={alt} style={{ maxWidth: "100%", height: "auto", borderRadius: 6 }} />
+              ),
+              table: ({ children }) => (
+                <table style={{ borderCollapse: "collapse", width: "100%", marginBottom: 16 }}>{children}</table>
+              ),
+              th: ({ children }) => (
+                <th style={{ border: `1px solid ${C.border}`, padding: "8px 12px", color: C.soft, textAlign: "left", background: C.surfaceDeep }}>{children}</th>
+              ),
+              td: ({ children }) => (
+                <td style={{ border: `1px solid ${C.border}`, padding: "8px 12px", color: C.light }}>{children}</td>
+              ),
+            }}
           >
             {md}
           </ReactMarkdown>

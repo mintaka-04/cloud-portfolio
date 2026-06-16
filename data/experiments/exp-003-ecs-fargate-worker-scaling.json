@@ -1,0 +1,26 @@
+{
+	"id": "exp-003-ecs-fargate-worker-scaling",
+	"title": "ECS + Fargate 기반 워커 수평 확장 구조 도입 및 처리량 확장",
+	"hypothesis": "SQS 기반 비동기 구조에서 worker 실행 환경을 ECS Fargate 기반으로 전환한다면 수평 확장을 통해 처리량을 효과적으로 확장시킬 수 있을 것이다",
+	"status": "completed",
+	"validation": "partial",
+	"result_metrics": {
+		"baseline_avg_s": 0.94,
+		"baseline_p95_s": 1.01,
+		"error_rate": 0.0,
+		"saturation_point_rps": 80,
+		"request_wait_dominance": true,
+		"timeout_observed": true
+	},
+	"primary_metric_name": "request_rate_saturation",
+	"primary_metric_value": "80_rps",
+	"conclusion": "ECS Fargate 기반 scaling 효과를 검증하기 전에 시스템은 약 80 req/s에서 PostgREST 및 Supabase Realtime에 의해 처리량이 포화되며 DB 계층 병목이 먼저 발생함",
+	"problem_found": "부하 증가 시 PostgREST worker가 DB 쿼리 대기 상태에 머물며 처리량이 제한되었고, Supabase Realtime의 WAL 기반 realtime.list_changes 쿼리가 DB 리소스를 지속적으로 점유하면서 전체 요청 지연이 발생",
+	"improvement": "DB로부터 Realtime 기반 이벤트 트리거 분리 및 이벤트를 메시지 큐 기반 구조로 전환하여 DB는 저장 역할에 집중하도록 개선 필요",
+	"github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-003-ecs-fargate-worker-scaling",
+	"diagram_url": "",
+	"arch_version": "v2.0",
+	"tags": ["baseline", "supabase-realtime", "load-testing", "db-bottleneck", "request-saturation", "timeout"],
+	"started_at": "2026-05-26",
+	"ended_at": "2026-06-02"
+}

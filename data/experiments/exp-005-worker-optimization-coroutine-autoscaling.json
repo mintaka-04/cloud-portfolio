@@ -1,0 +1,20 @@
+{
+	"id": "exp-005-worker-optimization-coroutine-autoscaling",
+	"title": "Coroutine 기반 워커 실행 최적화 및 autoscaling 적용을 통한 처리 효율 개선",
+	"hypothesis": "coroutine 기반 concurrency 개선과 autoscaling 적용을 통해 단일 worker 처리 효율 및 전체 시스템 처리량을 향상시킬 수 있을 것이다",
+	"status": "running",
+	"validation": "partial",
+	"result_metrics": {
+	},
+	"primary_metric_name": "",
+	"primary_metric_value": "",
+	"conclusion": "",
+	"problem_found": "",
+	"improvement": "",
+	"github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-005-worker-optimization-coroutine-autoscaling",
+	"diagram_url": "",
+	"arch_version": "v3.1",
+	"tags": [],
+	"started_at": "2026-06-13",
+	"ended_at": ""
+}

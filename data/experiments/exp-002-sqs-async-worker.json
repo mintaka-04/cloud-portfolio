@@ -1,0 +1,25 @@
+{
+	"id": "exp-002-sqs-async-worker",
+	"title": "SQS 기반 비동기 워커 구조 도입 및 처리 분리",
+	"hypothesis": "vercel + ec2 기반의 동기 처리 구조에서 발생하는 병목은 SQS 기반 비동기 처리 구조를 도입함으로써 해소될 것이다",
+	"status": "completed",
+	"validation": "partial",
+	"result_metrics": {
+		"baseline_avg_s": 0.96,
+		"baseline_p95_s": 1.04,
+		"error_rate": 0.0,
+		"cpu_peak_percent": 12.9,
+		"queue_backlog_detected": true
+	},
+	"primary_metric_name": "queue_backlog",
+	"primary_metric_value": "accumulating",
+	"conclusion": "SQS 도입으로 CPU 병목은 해소되었으나 worker 처리량 부족으로 queue backlog가 지속적으로 발생함",
+	"problem_found": "worker 1개의 처리 속도가 요청 유입량보다 낮아 queue에 backlog가 지속적으로 누적되고, 이에 따라 처리 지연이 점점 증가하는 현상이 나타남",
+	"improvement": "worker 수 확장 또는 병렬 처리 구조 도입을 통한 queue 소비 처리량 증가 필요",
+	"github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-002-sqs-async-worker",
+	"diagram_url": "",
+	"arch_version": "v1.1",
+	"tags": ["baseline", "sqs", "async-processing", "queue", "bottleneck-shift", "worker"],
+	"started_at": "2026-05-22",
+	"ended_at": "2026-05-25"
+}

@@ -1,0 +1,27 @@
+{
+	"id": "exp-004-realtime-to-event-driven-sqs-refactor",
+	"title": "Realtime 구조 제거 및 Event-driven SQS 기반 아키텍처로의 전환 및 안정성 강화",
+	"hypothesis": "Realtime 기반 구조에서 SQS 기반 event-driven 구조로 전환시 트래픽 증가 상황에서도 시스템이 더 안정적으로 동작할 것이다",
+	"status": "completed",
+	"validation": "partial",
+	"result_metrics": {
+		"baseline_avg_s": 1.03,
+		"baseline_p95_s": 1.19,
+		"error_rate": 0.0,
+		"sqs_backlog_growth": "high",
+		"visible_messages_peak": 1194,
+		"autoscaling_triggered": "delayed_trigger_after_test",
+		"rule_worker_concurrency": 1
+	},
+	"primary_metric_name": "sqs_backlog_growth",
+	"primary_metric_value": "unstable_increase",
+	"conclusion": "rule-worker 단일 처리 구조로 인해 SQS backlog가 급격히 증가하며 ai-worker까지 전달되는 유입량이 제한되어 auto scaling이 정상적으로 트리거되지 않음",
+	"problem_found": "rule-worker가 동시에 1개의 작업만 처리하는 구조로 인해 처리량이 유입량을 따라가지 못했고, 그 결과 SQS backlog가 지속적으로 누적되며 ai-queue의 autoscaling 임계값 도달이 지연됨",
+	"improvement": "rule-worker의 동시 처리 구조 도입 및 rule-worker 자체에 대한 auto scaling 적용이 필요",
+	"github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-004-realtime-to-event-driven-sqs-refactor",
+	"diagram_url": "",
+	"arch_version": "v3.0",
+	"tags": ["event-driven", "sqs", "queue-backlog", "worker-bottleneck", "autoscaling", "concurrency-limit", "system-flow"],
+	"started_at": "2026-06-08",
+	"ended_at": "2026-06-12"
+}
