@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
+import ReactMarkdown from 'react-markdown';
 
 // const C = {
 //   bg:          "#222831", // 전체 배경, 가장 어두운 톤
@@ -101,6 +102,44 @@ function ExpCard({ exp, onClick }) {
 }
 
 // ── Experiment Detail ──────────────────────────────────
+function MarkdownView({ url }) {
+  const [md, setMd] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const rawUrl = url
+    .replace('https://github.com/', 'https://raw.githubusercontent.com/')
+    .replace('/tree/', '/')
+    + '/README.md';
+
+  const load = (e) => {
+    e.stopPropagation();
+    if (!open && !md) {
+      fetch(rawUrl).then(r => r.text()).then(setMd);
+    }
+    setOpen(p => !p);
+  };
+
+  return (
+    <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10, overflow: "hidden" }}>
+      <div onClick={load}
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 24px", cursor: "pointer", transition: "border-color 0.15s" }}
+        onMouseEnter={e => e.currentTarget.style.background = C.surfaceDeep}
+        onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+        <div style={{ color: C.soft, fontSize: 13, fontWeight: 600 }}>상세 분석 보기</div>
+        <span style={{ color: C.muted, fontSize: 18 }}>{open ? "▲" : "▼"}</span>
+      </div>
+      {open && md && (
+        <div style={{ padding: "0 24px 24px", color: C.light, fontSize: 14, lineHeight: 1.8, borderTop: `1px solid ${C.border}` }}>
+          <ReactMarkdown>{md}</ReactMarkdown>
+        </div>
+      )}
+      {open && !md && (
+        <div style={{ padding: 24, color: C.muted, fontSize: 13 }}>불러오는 중...</div>
+      )}
+    </div>
+  );
+}
+
 function ExpDetail({ exp, onBack }) {
   const [expanded, setExpanded] = useState(false);
   const [imgZoom, setImgZoom] = useState(false);
@@ -192,18 +231,8 @@ function ExpDetail({ exp, onBack }) {
         )}
       </div>
 
-      {/* ── Level 2 (GitHub) ── */}
-      <a href={exp.github_doc_url} target="_blank" rel="noopener noreferrer"
-        onClick={e => e.stopPropagation()}
-        style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 24px", textDecoration: "none", transition: "border-color 0.15s" }}
-        onMouseEnter={e => e.currentTarget.style.borderColor = C.soft}
-        onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>
-        <div>
-          <div style={{ color: C.soft, fontSize: 13, fontWeight: 600, marginBottom: 2 }}>상세 분석 보기</div>
-          <div style={{ color: C.muted, fontSize: 12 }}>테스트 디자인 · 결과 분석 · 원인 분석 · 의사결정</div>
-        </div>
-        <span style={{ color: C.muted, fontSize: 18 }}>→</span>
-      </a>
+      {/* ── Level 2 (MD 렌더링) ── */}
+      <MarkdownView url={exp.github_doc_url} />
     </div>
   );
 }
