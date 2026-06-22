@@ -18,7 +18,7 @@
 	"problem_found": "메시지 1건 처리 시 다수의 DB 요청을 병렬로 실행하는 구조로 인해 PostgREST connection pool이 고갈되고, API와 worker가 동일 pool을 경쟁적으로 사용하면서 latency 증가 및 throughput 정체 발생",
 	"improvement": "DB 호출 수 감소, connection pool size 조정",
 	"github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-005-worker-optimization-coroutine-autoscaling",
-	"diagram_url": "",
+	"diagram_url": "https://raw.githubusercontent.com/mintaka-04/cloud-portfolio/main/diagrams/v5.png",
 	"arch_version": "v3.1",
 	"tags": ["Performance Testing",
 				"Load Testing",

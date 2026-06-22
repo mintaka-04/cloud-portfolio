@@ -17,7 +17,7 @@
 	"problem_found": "worker 1개의 처리 속도가 요청 유입량보다 낮아 queue에 backlog가 지속적으로 누적되고, 이에 따라 처리 지연이 점점 증가하는 현상이 나타남",
 	"improvement": "worker 수 확장 또는 병렬 처리 구조 도입을 통한 queue 소비 처리량 증가 필요",
 	"github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-002-sqs-async-worker",
-	"diagram_url": "",
+	"diagram_url": "https://raw.githubusercontent.com/mintaka-04/cloud-portfolio/main/diagrams/v2.png",
 	"arch_version": "v1.1",
 	"tags": ["baseline", "sqs", "async-processing", "queue", "bottleneck-shift", "worker"],
 	"started_at": "2026-05-22",

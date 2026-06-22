@@ -18,7 +18,7 @@
 	"problem_found": "부하 증가 시 PostgREST worker가 DB 쿼리 대기 상태에 머물며 처리량이 제한되었고, Supabase Realtime의 WAL 기반 realtime.list_changes 쿼리가 DB 리소스를 지속적으로 점유하면서 전체 요청 지연이 발생",
 	"improvement": "DB로부터 Realtime 기반 이벤트 트리거 분리 및 이벤트를 메시지 큐 기반 구조로 전환하여 DB는 저장 역할에 집중하도록 개선 필요",
 	"github_doc_url": "https://github.com/mintaka-04/cloud-portfolio/tree/main/experiments/exp-003-ecs-fargate-worker-scaling",
-	"diagram_url": "",
+	"diagram_url": "https://raw.githubusercontent.com/mintaka-04/cloud-portfolio/main/diagrams/v3.png",
 	"arch_version": "v2.0",
 	"tags": ["baseline", "supabase-realtime", "load-testing", "db-bottleneck", "request-saturation", "timeout"],
 	"started_at": "2026-05-26",
