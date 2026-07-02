@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>v1.7 — 캐시 적중률 저하 구간 재배치</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F6F2;
+    --grid:#C9D6E3;
+    --ink:#1B2430;
+    --ink-soft:#5B6675;
+    --accent:#FF5A1F;
+    --blue:#3B6EF0;
+    --line:#D7D2C5;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
+      var(--paper);
+    background-attachment: fixed;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  .frame{ background: rgba(247,246,242,.86); border-radius: 4px; }
+  .crop{position:fixed; width:18px; height:18px; opacity:.55; z-index:5;}
+  .crop::before,.crop::after{content:'';position:absolute;background:var(--ink-soft);}
+  .crop::before{width:18px;height:1px;top:0;left:0;}
+  .crop::after{width:1px;height:18px;top:0;left:0;}
+  .crop.tl{top:14px;left:14px;}
+  .crop.tr{top:14px;right:14px; transform:scaleX(-1);}
+  .crop.bl{bottom:14px;left:14px; transform:scaleY(-1);}
+  .crop.br{bottom:14px;right:14px; transform:scale(-1,-1);}
+
+  .frame{ max-width: 760px; margin:0 auto; padding: 56px 24px 140px; }
+
+  .back{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+    margin-bottom: 28px;
+  }
+  .back:hover{ color: var(--accent); }
+
+  header{ border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 6px; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing:.12em; text-transform:uppercase;
+    color: var(--accent);
+    display:flex; align-items:center; gap:10px; margin-bottom:12px;
+  }
+  .eyebrow .dot{ width:7px;height:7px;border-radius:50%;background:var(--accent); animation: pulse 1.8s infinite; }
+  @keyframes pulse{ 50%{opacity:.4;} }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size: 30px; line-height:1.25; max-width:560px;
+  }
+  .meta-row{
+    display:flex; gap:18px; margin-top:16px; flex-wrap:wrap;
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--ink-soft);
+  }
+  .meta-row span b{ color:var(--ink); }
+
+  .stack{ display:flex; gap:8px; margin: 18px 0 0; flex-wrap:wrap; }
+  .chip{
+    display:flex; align-items:center; gap:5px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    padding: 4px 9px 4px 7px; border:1px solid var(--line); border-radius:100px;
+    background: rgba(255,255,255,.5);
+  }
+  .chip .ic{ width:7px;height:7px;border-radius:2px;background:var(--blue); }
+  .chip.acc .ic{ background:var(--accent); }
+
+  section{ margin-top: 56px; position: relative; }
+  .sec-head{
+    display:flex; align-items:baseline; gap:14px; margin-bottom: 18px;
+  }
+  .num{
+    font-family:'Space Grotesk', sans-serif; font-weight:700;
+    font-size: 13px; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 4px;
+    width: 26px; height:26px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .sec-title{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size: 19px; }
+  .stamp{
+    margin-left:auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing:.08em; text-transform:uppercase;
+    border: 1.5px solid var(--accent); color: var(--accent);
+    padding: 3px 8px; border-radius: 3px;
+    transform: rotate(-3deg);
+    white-space:nowrap;
+  }
+  .stamp.muted{ border-color: var(--ink-soft); color: var(--ink-soft); transform: rotate(2deg); }
+
+  .body-text{ font-size: 15px; line-height:1.75; color: var(--ink); }
+  .body-text + .body-text{ margin-top: 12px; }
+
+  .note{
+    margin-top: 16px;
+    border-left: 3px solid var(--blue);
+    background: rgba(59,110,240,.06);
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-family:'JetBrains Mono', monospace;
+    line-height:1.6;
+  }
+
+  table{
+    width:100%; margin-top:18px; border-collapse: collapse;
+    font-family:'JetBrains Mono', monospace; font-size: 13px;
+  }
+  th,td{ text-align:left; padding: 10px 12px; border-bottom:1px solid var(--line); }
+  th{ color: var(--ink-soft); font-weight:500; text-transform:uppercase; font-size:11px; letter-spacing:.04em; }
+  td.num-val{ color: var(--ink); }
+  tr.highlight td{ color: var(--accent); font-weight:500; }
+
+  .sub-section{ margin-top: 28px; }
+  .sub-label{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    margin-bottom: 10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .sub-label::after{
+    content:''; flex:1; height:1px; background: var(--line);
+  }
+  .criteria-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;
+  }
+  .criteria-box{
+    border:1px solid var(--line); border-radius:5px; padding:14px 16px;
+    background: rgba(255,255,255,.4);
+  }
+  .criteria-box.warn{ border-color: rgba(255,90,31,.3); background: rgba(255,90,31,.04); }
+  .criteria-box .c-title{
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:13px;
+    margin-bottom:10px;
+  }
+  .criteria-box.warn .c-title{ color: var(--accent); }
+  .criteria-box ul{ list-style:none; padding:0; }
+  .criteria-box ul li{
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--ink-soft);
+    padding: 4px 0; border-bottom:1px solid var(--line); line-height:1.5;
+  }
+  .criteria-box ul li:last-child{ border-bottom:none; }
+  .tooltip-wrap{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tooltip-icon{
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    border: 1px solid var(--ink-soft);
+    color: var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: default;
+    flex: none;
+  }
+  .tooltip-box{
+    display: none;
+    position: absolute;
+    left: 22px; top: 50%; transform: translateY(-50%);
+    width: 280px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 10px 14px;
+    border-radius: 5px;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .tooltip-wrap:hover .tooltip-box{ display: block; }
+  .badge{
+    display: inline-block;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing:.06em; text-transform:uppercase;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    padding: 3px 9px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+  .badge-content{
+    padding-left: 16px;
+  }
+  .placeholder{
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    padding: 24px;
+    margin-top: 18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: repeating-linear-gradient(135deg, rgba(0,0,0,.015) 0 8px, transparent 8px 16px);
+    text-align:center;
+  }
+
+  .next{
+    margin-top: 64px;
+    border-top: 2px solid var(--ink);
+    padding-top: 22px;
+    display:flex; justify-content:flex-end;
+  }
+  .next-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 12px 18px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+  }
+  .next-btn b{ color: var(--ink); font-size: 18px; font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.01em; text-transform: none; font-weight: 700; }
+  .next-btn:hover{ border-color: var(--ink); }
+  .next-btn:hover b{ color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class="frame">
+    <a class="back" href="../index.html">← all versions</a>
+
+    <header>
+      <div class="eyebrow">v1.0 — shipped</div>
+      <h1>빠른 구현을 위한 초기 아키텍처</h1>
+      <div class="stack">
+        <span class="chip"><span class="ic"></span>Initial</span>
+        <span class="chip"><span class="ic"></span>Vercel</span>
+        <span class="chip"><span class="ic"></span>Supabase</span>
+        <span class="chip"><span class="ic"></span>EC2</span>
+      </div>
+    </header>
+
+    <!-- 1. 아키텍처 설명 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">01</div>
+        <div class="sec-title">아키텍처</div>
+      </div>
+      <p class="body-text">v1.0은 최대한 빠르게 구현하는 것을 목표로 설계했습니다.</p>
+      <p class="body-text">이를 위해 Frontend와 DB에는 각각 Vercel과 Supabase를 사용하였습니다.</p>
+      <p class="body-text">AI Worker는 사용자가 입력한 데이터를 처리해 OpenAI API를 호출하는 백그라운드 프로세스이므로, EC2에 별도로 배포하였습니다.</p>
+      <p class="body-text">배포는 GithubActions를 사용하여 Vercel과 EC2에 자동으로 이루어지도록 구성하였습니다.</p>
+      <div class="placeholder"><img src="../../../assets/images/bottleneck_experiments/v1/v1-diagram.png" alt="v1.0 아키텍처 다이어그램" style="width:100%; display:block; border-radius:4px;"></div>
+    </section>
+
+    <!-- 2. 왜 이 구조 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">02</div>
+        <div class="sec-title">왜 이 구조였는가</div>
+      </div>
+      <p class="body-text">[이전 버전에서 어떤 한계가 있었고, 그래서 왜 이 방향을 택했는지.]</p>
+    </section>
+
+    <!-- 3. 실험 설계 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">03</div>
+        <div class="sec-title">실험 설계</div>
+      </div>
+      <p class="body-text">현재 아키텍처가 부하를 어느 정도 감당할 수 있는지 확인하고, 임계 구간과 한계 구간을 파악하고자 하였습니다. 이를 위해 지연율(avg, p95), 에러율, WebSocket 연결 끊김 발생 빈도, 리소스 사용량을 주요 지표로 삼았습니다. 기준을 정하기 위한 베이스라인 테스트를 수행하고, 이후 점진적 부하 테스트를 진행하였습니다.</p>
+
+      <div class="sub-section">
+        <div class="sub-label">사용 데이터</div>
+        <p class="body-text">실제 사용자의 사용 패턴을 반영하기 위해 위치 정보와 간단한 내용을 포함한 데이터를 생성하였습니다. 생성 후 상세 조회까지를 하나의 트랜잭션으로 간주하였습니다.</p>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">사용 도구 — k6</div>
+        <table>
+          <thead><tr><th>항목</th><th>고려 이유</th></tr></thead>
+          <tbody>
+            <tr><td>비용</td><td>무료로 사용할 수 있는 도구 선호</td></tr>
+            <tr><td>러닝커브</td><td>초기 프로젝트인 만큼 빠르게 테스트를 구성할 수 있어야 함</td></tr>
+            <tr><td>지원 생태계</td><td>자료가 많고 참고하기 쉬운 도구 선호</td></tr>
+          </tbody>
+        </table>
+        <p class="body-text" style="margin-top:12px;">코드 기반으로 시나리오를 관리할 수 있고, 별도의 실행 환경 구축 없이 빠르게 반복 실행할 수 있는 k6을 선택하였습니다.</p>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">테스트 상세</div>
+
+        <div class="sub-section" style="margin-top:16px;">
+          <div class="badge">베이스라인 테스트</div>
+          <div class="badge-content">
+            <p class="body-text">단일 사용자가 사용한다는 가정 하에 기본 성능을 측정하였습니다.</p>
+          </div>
+        </div>
+
+        <div class="sub-section" style="margin-top:16px;">
+          <div class="badge">점진적 부하 테스트</div>
+          <div class="badge-content">
+            <p class="body-text">동시 사용자 수(VUs)를 10 → 30 → 50 → 100으로 단계적으로 증가시키고, 각 단계에서 2~3분간 부하를 유지하도록 설계하였습니다.</p>
+          </div>
+        </div>
+
+        <div class="sub-section" style="margin-top:16px;">
+          <div class="badge">추가 고려가 필요했던 사항</div>
+          <div class="badge-content">
+            <p class="body-text">실제로는 과도한 AI 사용을 방지하기 위해 사용자별 일일 AI 호출 횟수를 제한하고 있었습니다. 그러나 부하 테스트에서는 해당 제한으로 인해 시스템의 실제 한계를 확인하기 어려웠습니다. 따라서 테스트 환경에서는 해당 제한을 비활성화하여 시스템 자체의 실제 처리 성능을 측정할 수 있도록 하였습니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">판단 기준</div>
+        <div class="criteria-grid">
+          <div class="criteria-box">
+            <div class="c-title">임계점</div>
+            <ul>
+              <li>WebSocket 끊김 시작</li>
+              <li>avg 또는 p95가 베이스라인 대비 2배 증가</li>
+              <li>에러율 1~2%</li>
+              <li>CPU 70~80% 지속</li>
+            </ul>
+          </div>
+          <div class="criteria-box warn">
+            <div class="c-title">한계점</div>
+            <ul>
+              <li>WebSocket 대량 끊김</li>
+              <li>avg 또는 p95가 베이스라인 대비 4배 증가</li>
+              <li>에러율 5% 이상 지속</li>
+              <li>CPU 90% 이상 또는 OOM</li>
+            </ul>
+          </div>
+        </div>
+        <p class="body-text" style="margin-top:12px;">초기 테스트이므로 일반적인 운영 환경의 성능 저하 판단 기준을 참고하여 임계점과 한계점을 설정하였습니다.</p>
+      </div>
+    </section>
+
+    <!-- 4. 실험 결과 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">04</div>
+        <div class="sec-title">실험 결과</div>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">베이스라인 테스트</div>
+        <table>
+          <thead><tr><th>회차</th><th>avg (s)</th><th>p95 (s)</th><th>에러율</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>2.35</td><td>3.10</td><td>0%</td></tr>
+            <tr><td>2</td><td>1.36</td><td>1.86</td><td>0%</td></tr>
+            <tr><td>3</td><td>1.41</td><td>1.95</td><td>0%</td></tr>
+            <tr><td>4</td><td>1.56</td><td>1.71</td><td>0%</td></tr>
+            <tr><td>5</td><td>1.62</td><td>1.78</td><td>0%</td></tr>
+            <tr><td>6</td><td>0.83</td><td>0.83</td><td>0%</td></tr>
+            <tr><td>7</td><td>1.14</td><td>1.44</td><td>0%</td></tr>
+            <tr><td>8</td><td>0.84</td><td>0.85</td><td>0%</td></tr>
+            <tr><td>9</td><td>1.36</td><td>1.86</td><td>0%</td></tr>
+            <tr><td>10</td><td>1.29</td><td>1.73</td><td>0%</td></tr>
+            <tr class="highlight"><td>평균 (2~10회)</td><td>1.27</td><td>1.56</td><td>0%</td></tr>
+          </tbody>
+        </table>
+        <p class="body-text" style="margin-top:12px;">1회차는 Vercel cold start로 간주하여 제외하였습니다. 2~10회차 평균을 베이스라인으로 설정하였습니다.</p>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">점진적 부하 테스트</div>
+        <table>
+          <thead><tr><th>지표</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td>avg</td><td class="num-val">787ms <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-box">초기 베이스라인 테스트는 각 회차를 긴 간격으로 수행하여 Vercel Function의 Warm 상태를 유지하지 못했습니다. 이후 기록을 재검토하면서 베이스라인에 Cold Start의 영향이 일부 포함되었을 가능성을 확인했습니다.</span></span></td></tr>
+            <tr><td>p95</td><td class="num-val">918ms</td></tr>
+            <tr class="highlight"><td>에러율</td><td>0%</td></tr>
+          </tbody>
+        </table>
+        <div class="placeholder" style="margin-top:18px;"><img src="../../../assets/images/bottleneck_experiments/v1/v1-cpu-memory-graph.png" alt="CPU 및 메모리 그래프" style="width:100%; display:block; border-radius:4px;"></div>
+        <div class="sub-section" style="margin-top:16px;">
+          <p class="body-text">80~100 VUs 구간에서 CPU 사용률이 99%에 도달하였습니다.</p>
+          <p class="body-text" style="margin-top:8px;">CPU 사용률이 급격히 상승하는 구간을 확인하였으며, 과부하 시점에 SSM 접속이 불가능한 현상이 발생하였습니다. 동일 시점부터 CloudWatch Agent를 통한 CPU 및 메모리 메트릭 수집도 중단되었습니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 판단 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">05</div>
+        <div class="sec-title">판단 및 이유</div>
+      </div>
+      <p class="body-text">베이스라인 결과로부터 계산한 임계점과 한계점을 적용해 결과를 분석하였습니다.</p>
+
+      <div class="criteria-grid" style="margin-top:18px;">
+        <div class="criteria-box">
+          <div class="c-title">임계점 — 약 50 VU</div>
+          <ul>
+            <li>응답시간(avg, p95)과 CPU 사용률 증가 시작</li>
+            <li>성능 저하 구간 진입으로 판단</li>
+          </ul>
+        </div>
+        <div class="criteria-box warn">
+          <div class="c-title">한계점 — 약 100 VU</div>
+          <ul>
+            <li>CPU 사용률 99% 도달</li>
+            <li>SSM 접속 불가능 등 장애 상태 발생</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="body-text" style="margin-top:28px;">AI 요청 처리는 단일 EC2 인스턴스의 단일 Worker가 수행하는 구조이므로 동시에 처리 가능한 작업 수에 한계가 존재합니다. 부하가 증가하여 요청 유입 속도가 Worker의 처리 속도를 초과하게 되면 처리 지연이 발생할 수 있으며, 실제 테스트에서도 일정 시점 이후 CPU 사용률이 급격히 상승하고 SSM 접속이 불가능한 현상이 발생하였습니다.</p>
+      <p class="body-text" style="margin-top:12px;">이에 따라 단일 Worker 구조의 처리 한계가 드러난 것으로 판단하였습니다. 또한 과부하 시점에는 CloudWatch Agent가 CPU 및 메모리 로그를 확보하지 못하게 되므로, 정확한 병목 분석에는 한계가 있다는 점도 확인하였습니다.</p>
+    </section>
+
+    <!-- 6. 개선 방향 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">06</div>
+        <div class="sec-title">개선 방향과 선택 이유</div>
+      </div>
+      <p class="body-text">현재 구조에서는 AI 요청이 <strong>단일 Worker에 집중되어 병목이 발생</strong>하며, 일정 수준 이상의 부하에서 시스템이 안정적으로 동작하지 못하는 한계를 확인했습니다. 따라서 다음 버전에서는 <strong>요청을 안정적으로 처리할 수 있는 구조</strong>로 개선할 필요가 있다고 판단했습니다.</p>
+      <p class="body-text" style="margin-top:12px;">이를 위해 순간적으로 요청이 증가하더라도 요청을 안정적으로 수용하고, Worker가 순차적으로 처리할 수 있도록 하기 위해 <strong>Queue를 도입</strong>하는 방향으로 개선 방향을 결정하였습니다.</p>
+    </section>
+
+    <div class="next">
+      <a href="#" class="next-btn">next up<b>v1.2 — 정적 자산 캐싱 도입</b></a>
+    </div>
+
+  </div>
+</body>
+</html>

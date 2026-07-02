@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Engineering Log</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F6F2;
+    --grid:#C9D6E3;
+    --ink:#1B2430;
+    --ink-soft:#5B6675;
+    --accent:#FF5A1F;
+    --blue:#3B6EF0;
+    --line:#D7D2C5;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
+      var(--paper);
+    background-attachment: fixed;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+
+  .frame{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 120px;
+    position: relative;
+  }
+  /* corner crop marks */
+  .crop{position:fixed; width:18px; height:18px; opacity:.55; z-index:5;}
+  .crop::before,.crop::after{content:'';position:absolute;background:var(--ink-soft);}
+  .crop::before{width:18px;height:1px;top:0;left:0;}
+  .crop::after{width:1px;height:18px;top:0;left:0;}
+  .crop.tl{top:14px;left:14px;}
+  .crop.tr{top:14px;right:14px; transform:scaleX(-1);}
+  .crop.bl{bottom:14px;left:14px; transform:scaleY(-1);}
+  .crop.br{bottom:14px;right:14px; transform:scale(-1,-1);}
+
+  header{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 18px;
+    margin-bottom: 8px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,90,31,.18);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse{ 50%{opacity:.4;} }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size: 34px;
+    letter-spacing: -0.01em;
+  }
+  .meta-top{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align:right;
+    line-height:1.6;
+  }
+  .sub{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 14px 0 48px;
+    max-width: 480px;
+  }
+
+  .log{
+    position: relative;
+    padding-left: 28px;
+  }
+  .log::before{
+    content:'';
+    position:absolute;
+    left: 5px; top: 6px; bottom: 6px;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, var(--ink-soft) 0 4px, transparent 4px 8px);
+    opacity:.5;
+  }
+  .entry{
+    position: relative;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+    display:block;
+    text-decoration:none;
+    color:inherit;
+    transition: padding-left .18s ease;
+  }
+  .entry:last-child{ border-bottom:none; }
+  .entry::before{
+    content:'';
+    position:absolute;
+    left: -28px; top: 28px;
+    width: 11px; height:11px;
+    border-radius:50%;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+  }
+  .entry.active::before{ background: var(--accent); border-color: var(--accent); }
+  .entry:hover{ padding-left: 8px; }
+  .entry:hover .ver{ color: var(--accent); }
+
+  .row1{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  .ver{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size: 22px;
+    transition: color .15s;
+    text-shadow: 0 0 6px var(--paper), 0 0 6px var(--paper);
+  }
+  .status{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing:.06em;
+    padding: 3px 8px;
+    border: 1px solid var(--ink);
+    border-radius: 3px;
+    text-transform: uppercase;
+    transform: rotate(-2deg);
+  }
+  .status.live{ border-color:var(--accent); color:var(--accent); }
+  .status.done{ color: var(--ink-soft); border-color: var(--ink-soft); }
+  .date{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-left:auto;
+  }
+  .title{
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    max-width: 560px;
+    text-shadow: 0 0 5px var(--paper), 0 0 5px var(--paper);
+  }
+  .stack{
+    display:flex; gap:8px; margin-top: 14px; flex-wrap:wrap;
+  }
+  .chip{
+    display:flex; align-items:center; gap:5px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 9px 4px 7px;
+    border:1px solid var(--line);
+    border-radius: 100px;
+    background: rgba(255,255,255,.5);
+    color: var(--ink);
+  }
+  .chip .ic{
+    width:7px;height:7px;border-radius:2px;background:var(--blue);
+    flex:none;
+  }
+  .chip.acc .ic{ background:var(--accent); }
+
+  .status-note{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 10px;
+  }
+  footer{
+    margin-top: 64px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    border-top: 1px dashed var(--line);
+    padding-top: 18px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="frame">
+    <header>
+      <div>
+        <div class="eyebrow"><span class="dot"></span>engineering log — 진행중</div>
+        <h1>아키텍처 변경 기록</h1>
+      </div>
+      <div class="meta-top">last commit · 2일 전</div>
+    </header>
+    <p class="sub">버전마다 무엇을 바꿨고, 왜 그렇게 판단했는지를 그대로 남깁니다. 끝난 기록이 아니라 다음 버전으로 이어지는 작업 로그입니다.</p>
+
+    <div class="log">
+
+      <a class="entry active" href="versions/v1.0.html">
+        <div class="row1">
+          <span class="ver">v1.7</span>
+          <span class="status live">in progress</span>
+
+        </div>
+        <div class="title">캐시 적중률 저하 구간을 잡기 위한 레이어 재배치</div>
+        <div class="stack">
+          <span class="chip acc"><span class="ic"></span>Redis Cluster</span>
+          <span class="chip"><span class="ic"></span>Nginx</span>
+          <span class="chip"><span class="ic"></span>OpenTelemetry</span>
+        </div>
+      </a>
+
+      <a class="entry" href="#">
+        <div class="row1">
+          <span class="ver">v1.6</span>
+          <span class="status done">shipped</span>
+
+        </div>
+        <div class="title">비동기 큐 도입으로 쓰기 경합 완화</div>
+        <div class="stack">
+          <span class="chip"><span class="ic"></span>Kafka</span>
+          <span class="chip"><span class="ic"></span>PostgreSQL</span>
+        </div>
+      </a>
+
+      <a class="entry" href="#">
+        <div class="row1">
+          <span class="ver">v1.5</span>
+          <span class="status done">shipped</span>
+
+        </div>
+        <div class="title">단일 인스턴스 → 수평 분산 구조 전환</div>
+        <div class="stack">
+          <span class="chip"><span class="ic"></span>Docker Swarm</span>
+          <span class="chip"><span class="ic"></span>HAProxy</span>
+        </div>
+      </a>
+
+      <a class="entry" href="#">
+        <div class="row1">
+          <span class="ver">v1.4</span>
+          <span class="status done">shipped</span>
+
+        </div>
+        <div class="title">읽기 전용 레플리카 분리</div>
+        <div class="stack">
+          <span class="chip"><span class="ic"></span>PostgreSQL</span>
+          <span class="chip"><span class="ic"></span>PgBouncer</span>
+        </div>
+      </a>
+
+      <a class="entry" href="#">
+        <div class="row1">
+          <span class="ver">v1.3</span>
+          <span class="status done">shipped</span>
+
+        </div>
+        <div class="title">로그 수집 파이프라인 비동기화</div>
+        <div class="stack">
+          <span class="chip"><span class="ic"></span>Fluent Bit</span>
+          <span class="chip"><span class="ic"></span>Loki</span>
+        </div>
+      </a>
+
+      <a class="entry" href="#">
+        <div class="row1">
+          <span class="ver">v1.2</span>
+          <span class="status done">shipped</span>
+
+        </div>
+        <div class="title">정적 자산 캐싱 도입</div>
+        <div class="stack">
+          <span class="chip"><span class="ic"></span>CloudFront</span>
+        </div>
+      </a>
+
+      <a class="entry" href="#">
+        <div class="row1">
+          <span class="ver">v1.0</span>
+          <span class="status done">shipped</span>
+
+        </div>
+        <div class="title">초기 모놀리식 구조</div>
+        <div class="stack">
+          <span class="chip"><span class="ic"></span>Express</span>
+          <span class="chip"><span class="ic"></span>MySQL</span>
+        </div>
+      </a>
+
+    </div>
+
+  </div>
+</body>
+</html>
