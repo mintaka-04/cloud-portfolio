@@ -24,7 +24,7 @@ export default {
     `),
 
     // 03 실험 설계
-    section(3, '실험 설계', `
+    section(2, '실험 설계', `
       ${text([
         '현재 아키텍처가 부하를 어느 정도 감당할 수 있는지 확인하고, 임계 구간과 한계 구간을 파악하고자 하였습니다. 이를 위해 지연율(avg, p95), 에러율, WebSocket 연결 끊김 발생 빈도, 리소스 사용량을 주요 지표로 삼았습니다. 기준을 정하기 위한 베이스라인 테스트를 수행하고, 이후 점진적 부하 테스트를 진행하였습니다.',
       ])}
@@ -61,7 +61,7 @@ export default {
     `),
 
     // 04 실험 결과
-    section(4, '실험 결과', `
+    section(3, '실험 결과', `
       ${subLabel('베이스라인 테스트', `
         ${table({
           head: ['회차', 'avg (s)', 'p95 (s)', '에러율'],
@@ -85,18 +85,18 @@ export default {
         ${table({
           head: ['지표', '결과'],
           rows: [
-            { cells: ['avg', '787ms <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-box">${TOOLTIP_COLD_START}</span></span>'] },
+            { cells: ['avg', `787ms <span class="tooltip-wrap"><span class="tooltip-icon">?</span><span class="tooltip-box">${TOOLTIP_COLD_START}</span></span>`] },
             { cells: ['p95', '918ms'] },
             { cells: ['에러율', '0%'], highlight: true },
           ]
         })}
-        <div class="placeholder" style="margin-top:18px;">CPU 및 메모리 그래프 자리</div>
+        ${imageUrl('../../assets/images/bottleneck_experiments/v1/v1-cpu-memory-graph.png', 'CPU 및 메모리 그래프')}
         <p class="body-text" style="margin-top:16px;">80~100 VUs 구간에서 CPU 사용률이 99%에 도달하였습니다. CPU 사용률이 급격히 상승하는 구간을 확인하였으며, 과부하 시점에 SSM 접속이 불가능한 현상이 발생하였습니다. 동일 시점부터 CloudWatch Agent를 통한 CPU 및 메모리 메트릭 수집도 중단되었습니다.</p>
       `)}
     `),
 
     // 05 판단
-    section(5, '판단 및 이유', `
+    section(4, '판단 및 이유', `
       <p class="body-text">베이스라인 결과로부터 계산한 임계점과 한계점을 적용해 결과를 분석하였습니다.</p>
       ${criteriaGrid({
         left: {
@@ -115,7 +115,7 @@ export default {
     `),
 
     // 06 개선 방향
-    section(6, '개선 방향', `
+    section(5, '개선 방향', `
       ${text([
         '현재 구조에서는 AI 요청이 <strong>단일 Worker에 집중되어 병목이 발생</strong>하며, 일정 수준 이상의 부하에서 시스템이 안정적으로 동작하지 못하는 한계를 확인했습니다. 따라서 다음 버전에서는 <strong>요청을 안정적으로 처리할 수 있는 구조</strong>로 개선할 필요가 있다고 판단했습니다.',
         '이를 위해 순간적으로 요청이 증가하더라도 요청을 안정적으로 수용하고, Worker가 순차적으로 처리할 수 있도록 하기 위해 <strong>Queue를 도입</strong>하는 방향으로 개선 방향을 결정하였습니다.',

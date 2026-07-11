@@ -73,10 +73,9 @@ export default {
             { cells: ['SQS Backlog', '지속적으로 증가'], highlight: true },
           ]
         })}
-        <div class="placeholder" style="margin-top:18px;">CPU 사용률 그래프 자리</div>
+        ${imageUrl('../../assets/images/bottleneck_experiments/v2/v2-cpu-graph.png', 'CPU 사용률 그래프')}
         <p class="body-text" style="margin-top:16px;">부하가 증가함에 따라 SQS의 대기 메시지 수가 지속적으로 증가하였으며, 테스트 종료 시점에도 처리되지 않은 메시지가 남아 있는 것을 확인하였습니다.</p>
-        <div class="placeholder" style="margin-top:14px;">SQS 그래프 자리 1</div>
-        <div class="placeholder" style="margin-top:12px;">SQS 그래프 자리 2</div>
+        ${imageUrl('../../assets/images/bottleneck_experiments/v2/v2-oldestmessage.png', 'SQS Oldest Message Age 그래프')}
       `)}
     `),
 

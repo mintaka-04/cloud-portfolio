@@ -13,7 +13,7 @@ export function image(placeholder = '이미지 자리') {
 }
 
 export function imageUrl(src, alt = '') {
-  return `<div class="placeholder"><img src="${src}" alt="${alt}" style="width:100%;display:block;border-radius:4px;"></div>`;
+  return `<div class="placeholder has-image"><img src="${src}" alt="${alt}" style="width:100%;display:block;"></div>`;
 }
 
 export function badge(label, content) {

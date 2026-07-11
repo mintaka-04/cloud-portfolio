@@ -10,7 +10,7 @@
 </head>
 <body>
   <div class="frame">
-    <a class="back" href="../index.html">← all versions</a>
+    <a class="back" href="index.html">← all versions</a>
     <header>
       <div class="eyebrow" id="page-eyebrow"></div>
       <h1 id="page-heading"></h1>
@@ -36,7 +36,7 @@
       });
     }
 
-    function render(page) {
+    async function render(page) {
       document.title = `${page.version} — ${page.title}`;
       document.getElementById('page-eyebrow').textContent = `${page.version} — ${page.status}`;
       document.getElementById('page-heading').textContent = page.title;
@@ -54,10 +54,12 @@
       const nav = document.getElementById('page-nav');
       let navHTML = '';
       if (page.prev) {
-        navHTML += `<a href="v${page.prev}.html" class="next-btn">prev<b>v${page.prev}</b></a>`;
+        const prevTitle = (await import(`./versions/v${page.prev}.js`)).default.title;
+        navHTML += `<a href="v${page.prev}.html" class="next-btn">prev<b>v${page.prev}</b><span class="next-btn-title">${prevTitle}</span></a>`;
       }
       if (page.next) {
-        navHTML += `<a href="v${page.next}.html" class="next-btn">next up<b>v${page.next}</b></a>`;
+        const nextTitle = (await import(`./versions/v${page.next}.js`)).default.title;
+        navHTML += `<a href="v${page.next}.html" class="next-btn next-btn-next">next up<b>v${page.next}</b><span class="next-btn-title">${nextTitle}</span></a>`;
       }
       nav.innerHTML = navHTML;
     }
