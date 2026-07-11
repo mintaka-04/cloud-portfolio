@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title id="page-title">Engineering Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../common.css">
+</head>
+<body>
+  <div class="frame">
+    <a class="back" href="../index.html">← all versions</a>
+    <header>
+      <div class="eyebrow" id="page-eyebrow"></div>
+      <h1 id="page-heading"></h1>
+      <div class="stack" id="page-tags"></div>
+    </header>
+    <div id="page-content"></div>
+    <div class="next" id="page-nav"></div>
+  </div>
+
+  <script type="module">
+    // URL에서 버전 읽기 (?v=1.0 또는 파일명에서)
+    const params = new URLSearchParams(location.search);
+    let ver = params.get('v');
+    if (!ver) {
+      // 파일명에서 추출 (v1.0.html → 1.0)
+      ver = location.pathname.match(/v([\d.]+)\.html/)?.[1];
+    }
+
+    if (ver) {
+      import(`../versions/v${ver}.js`).then(mod => {
+        const page = mod.default;
+        render(page);
+      });
+    }
+
+    function render(page) {
+      document.title = `${page.version} — ${page.title}`;
+      document.getElementById('page-eyebrow').textContent = `${page.version} — ${page.status}`;
+      document.getElementById('page-heading').textContent = page.title;
+
+      // 태그
+      const tagEl = document.getElementById('page-tags');
+      tagEl.innerHTML = page.tags.map(t =>
+        `<span class="chip"><span class="ic"></span>${t}</span>`
+      ).join('');
+
+      // 본문
+      document.getElementById('page-content').innerHTML = page.sections.join('\n');
+
+      // 네비게이션
+      const nav = document.getElementById('page-nav');
+      let navHTML = '';
+      if (page.prev) {
+        navHTML += `<a href="v${page.prev}.html" class="next-btn">prev<b>v${page.prev}</b></a>`;
+      }
+      if (page.next) {
+        navHTML += `<a href="v${page.next}.html" class="next-btn">next up<b>v${page.next}</b></a>`;
+      }
+      nav.innerHTML = navHTML;
+    }
+  </script>
+</body>
+</html>
