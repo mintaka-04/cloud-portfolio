@@ -20,7 +20,7 @@ export default {
         'AI Worker는 사용자가 입력한 데이터를 처리해 OpenAI API를 호출하는 백그라운드 프로세스이므로, EC2에 별도로 배포하였습니다.',
         '배포는 GithubActions를 사용하여 Vercel과 EC2에 자동으로 이루어지도록 구성하였습니다.',
       ])}
-      ${imageUrl('/assets/images/bottleneck_experiments/v1/v1-diagram.png', 'v1.0 아키텍처 다이어그램')}
+      ${imageUrl('../../assets/images/bottleneck_experiments/v1/v1-diagram.png', 'v1.0 아키텍처 다이어그램')}
     `),
 
     // 03 실험 설계

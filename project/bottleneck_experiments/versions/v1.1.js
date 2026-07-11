@@ -17,7 +17,7 @@ export default {
         'Main은 Supabase Realtime을 통해 데이터를 수신한 뒤 Rule Engine에 따라 AI 처리가 필요한 작업을 SQS에 등록합니다.',
         'Worker는 SQS에서 작업을 가져와 OpenAI API를 호출해 LLM 처리를 수행하도록 구성하였습니다.',
       ])}
-      ${imageUrl('/assets/images/bottleneck_experiments/v2/v2-diagram.png', 'v1.1 아키텍처 다이어그램')}
+      ${imageUrl('../../assets/images/bottleneck_experiments/v2/v2-diagram.png', 'v1.1 아키텍처 다이어그램')}
     `),
 
     // 02 개선 배경
