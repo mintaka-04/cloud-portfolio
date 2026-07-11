@@ -30,7 +30,7 @@
     }
 
     if (ver) {
-      import(`../versions/v${ver}.js`).then(mod => {
+      import(`./versions/v${ver}.js`).then(mod => {
         const page = mod.default;
         render(page);
       });
