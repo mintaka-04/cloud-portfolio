@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>v1.1 — Main/Worker 분리 및 SQS 도입</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F6F2;
+    --grid:#C9D6E3;
+    --ink:#1B2430;
+    --ink-soft:#5B6675;
+    --accent:#FF5A1F;
+    --blue:#3B6EF0;
+    --line:#D7D2C5;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
+      var(--paper);
+    background-attachment: fixed;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  .frame{ background: rgba(247,246,242,.86); border-radius: 4px; }
+  .crop{position:fixed; width:18px; height:18px; opacity:.55; z-index:5;}
+  .crop::before,.crop::after{content:'';position:absolute;background:var(--ink-soft);}
+  .crop::before{width:18px;height:1px;top:0;left:0;}
+  .crop::after{width:1px;height:18px;top:0;left:0;}
+  .crop.tl{top:14px;left:14px;}
+  .crop.tr{top:14px;right:14px; transform:scaleX(-1);}
+  .crop.bl{bottom:14px;left:14px; transform:scaleY(-1);}
+  .crop.br{bottom:14px;right:14px; transform:scale(-1,-1);}
+
+  .frame{ max-width: 760px; margin:0 auto; padding: 56px 24px 140px; }
+
+  .back{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+    margin-bottom: 28px;
+  }
+  .back:hover{ color: var(--accent); }
+
+  header{ border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 6px; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing:.12em; text-transform:uppercase;
+    color: var(--accent);
+    display:flex; align-items:center; gap:10px; margin-bottom:12px;
+  }
+  .eyebrow .dot{ width:7px;height:7px;border-radius:50%;background:var(--accent); animation: pulse 1.8s infinite; }
+  @keyframes pulse{ 50%{opacity:.4;} }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size: 30px; line-height:1.25; max-width:560px;
+  }
+  .meta-row{
+    display:flex; gap:18px; margin-top:16px; flex-wrap:wrap;
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--ink-soft);
+  }
+  .meta-row span b{ color:var(--ink); }
+
+  .stack{ display:flex; gap:8px; margin: 18px 0 0; flex-wrap:wrap; }
+  .chip{
+    display:flex; align-items:center; gap:5px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    padding: 4px 9px 4px 7px; border:1px solid var(--line); border-radius:100px;
+    background: rgba(255,255,255,.5);
+  }
+  .chip .ic{ width:7px;height:7px;border-radius:2px;background:var(--blue); }
+  .chip.acc .ic{ background:var(--accent); }
+
+  section{ margin-top: 56px; position: relative; }
+  .sec-head{
+    display:flex; align-items:baseline; gap:14px; margin-bottom: 18px;
+  }
+  .num{
+    font-family:'Space Grotesk', sans-serif; font-weight:700;
+    font-size: 13px; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 4px;
+    width: 26px; height:26px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .sec-title{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size: 19px; }
+  .stamp{
+    margin-left:auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing:.08em; text-transform:uppercase;
+    border: 1.5px solid var(--accent); color: var(--accent);
+    padding: 3px 8px; border-radius: 3px;
+    transform: rotate(-3deg);
+    white-space:nowrap;
+  }
+  .stamp.muted{ border-color: var(--ink-soft); color: var(--ink-soft); transform: rotate(2deg); }
+
+  .body-text{ font-size: 15px; line-height:1.75; color: var(--ink); }
+  .body-text + .body-text{ margin-top: 12px; }
+
+  .note{
+    margin-top: 16px;
+    border-left: 3px solid var(--blue);
+    background: rgba(59,110,240,.06);
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-family:'JetBrains Mono', monospace;
+    line-height:1.6;
+  }
+
+  table{
+    width:100%; margin-top:18px; border-collapse: collapse;
+    font-family:'JetBrains Mono', monospace; font-size: 13px;
+  }
+  th,td{ text-align:left; padding: 10px 12px; border-bottom:1px solid var(--line); }
+  th{ color: var(--ink-soft); font-weight:500; text-transform:uppercase; font-size:11px; letter-spacing:.04em; }
+  td.num-val{ color: var(--ink); }
+  tr.highlight td{ color: var(--accent); font-weight:500; }
+
+  .sub-section{ margin-top: 28px; }
+  .sub-label{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    margin-bottom: 10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .sub-label::after{
+    content:''; flex:1; height:1px; background: var(--line);
+  }
+  .criteria-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;
+  }
+  .criteria-box{
+    border:1px solid var(--line); border-radius:5px; padding:14px 16px;
+    background: rgba(255,255,255,.4);
+  }
+  .criteria-box.warn{ border-color: rgba(255,90,31,.3); background: rgba(255,90,31,.04); }
+  .criteria-box .c-title{
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:13px;
+    margin-bottom:10px;
+  }
+  .criteria-box.warn .c-title{ color: var(--accent); }
+  .criteria-box ul{ list-style:none; padding:0; }
+  .criteria-box ul li{
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--ink-soft);
+    padding: 4px 0; border-bottom:1px solid var(--line); line-height:1.5;
+  }
+  .criteria-box ul li:last-child{ border-bottom:none; }
+  .tooltip-wrap{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tooltip-icon{
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    border: 1px solid var(--ink-soft);
+    color: var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: default;
+    flex: none;
+  }
+  .tooltip-box{
+    display: none;
+    position: absolute;
+    left: 22px; top: 50%; transform: translateY(-50%);
+    width: 280px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 10px 14px;
+    border-radius: 5px;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .tooltip-wrap:hover .tooltip-box{ display: block; }
+  .badge{
+    display: inline-block;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing:.06em; text-transform:uppercase;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    padding: 3px 9px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+  .badge-content{
+    padding-left: 16px;
+  }
+  .placeholder{
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    padding: 24px;
+    margin-top: 18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: repeating-linear-gradient(135deg, rgba(0,0,0,.015) 0 8px, transparent 8px 16px);
+    text-align:center;
+  }
+
+  .next{
+    margin-top: 64px;
+    border-top: 2px solid var(--ink);
+    padding-top: 22px;
+    display:flex; justify-content:space-between;
+  }
+  .next-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 12px 18px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+  }
+  .next-btn b{ color: var(--ink); font-size: 18px; font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.01em; text-transform: none; font-weight: 700; }
+  .next-btn .next-title{
+    display: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    margin-top: 2px;
+  }
+  .next-btn:hover .next-title{ display: block; }
+  .next-btn:hover b{ color: var(--accent); }
+</style>
+</head>
+<body>
+
+  <div class="frame">
+    <a class="back" href="../index.html">← all versions</a>
+
+    <header>
+      <div class="eyebrow">v1.1 — shipped</div>
+      <h1>AI Worker 역할 분리 및 SQS 도입</h1>
+      <div class="stack">
+        <span class="chip"><span class="ic"></span>SQS</span>
+        <span class="chip"><span class="ic"></span>Queue</span>
+      </div>
+    </header>
+
+    <!-- 1. 아키텍처 설명 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">01</div>
+        <div class="sec-title">아키텍처</div>
+      </div>
+      <p class="body-text">하나의 프로세스로 동작하던 AI Worker를 역할에 따라 Main과 Worker로 분리하였습니다.</p>
+      <p class="body-text">Main은 Supabase Realtime을 통해 데이터를 수신한 뒤 Rule Engine에 따라 AI 처리가 필요한 작업을 SQS에 등록합니다.</p>
+      <p class="body-text">Worker는 SQS에서 작업을 가져와 OpenAI API를 호출해 LLM 처리를 수행하도록 구성하였습니다.</p>
+      <div class="placeholder"><img src="/assets/images/bottleneck_experiments/v2/v2-diagram.png" alt="v1.1 아키텍처 다이어그램" style="width:100%; display:block; border-radius:4px;"></div>
+    </section>
+
+    <!-- 2. 왜 이 구조 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">02</div>
+        <div class="sec-title">개선 배경</div>
+      </div>
+      <p class="body-text">이전 부하 테스트에서 일정 수준 이상의 부하에서 시스템이 안정적으로 동작하지 못한다는 것을 확인했습니다. 그 이유를 요청의 유입이 단일 Worker의 처리 속도보다 빠르기 때문이라고 판단하였습니다.</p>
+      <p class="body-text" style="margin-top:12px;">따라서 부하가 증가하더라도 요청을 안정적으로 수용할 수 있으며, Worker의 속도에 맞춰 작업을 처리할 수 있도록 Queue를 도입하였습니다.</p>
+      <p class="body-text" style="margin-top:12px;">또한 별도의 관리나 직접 운영을 필요로 하지 않고도 안정적인 Queue를 제공하며, 이후 Worker의 수평 확장에도 자연스럽게 대응할 수 있다는 점을 고려하여 Queue로는 AWS의 <strong>SQS</strong>를 사용하였습니다.</p>
+    </section>
+
+    <!-- 3. 실험 설계 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">03</div>
+        <div class="sec-title">실험 설계</div>
+      </div>
+      <p class="body-text">Queue 도입에 따른 성능 개선 효과를 검증하기 위해, 아키텍처를 제외한 모든 실험 조건은 이전 버전과 동일하게 유지하여 부하 테스트를 수행하였습니다.</p>
+      <p class="body-text" style="margin-top:12px;">또한 이전 실험보다 병목 발생 시점을 더욱 정확하게 확인하기 위해 CloudWatch Agent의 메트릭 수집 주기를 5분에서 1분으로 변경하였습니다.</p>
+
+      <div class="sub-section">
+        <div class="sub-label">테스트 상세</div>
+
+        <div class="sub-section" style="margin-top:16px;">
+          <div class="badge">베이스라인 테스트</div>
+          <div class="badge-content">
+            <p class="body-text">단일 사용자가 사용한다는 가정 하에 기본 성능을 측정하였습니다.</p>
+          </div>
+        </div>
+
+        <div class="sub-section" style="margin-top:16px;">
+          <div class="badge">점진적 부하 테스트</div>
+          <div class="badge-content">
+            <p class="body-text">동시 사용자 수(VUs)를 10 → 30 → 50 → 100으로 단계적으로 증가시켰습니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 실험 결과 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">04</div>
+        <div class="sec-title">실험 결과</div>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">베이스라인 테스트</div>
+        <table>
+          <thead><tr><th>회차</th><th>avg (s)</th><th>p95 (s)</th><th>에러율</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>2.19</td><td>2.73</td><td>0%</td></tr>
+            <tr><td>2</td><td>1.59</td><td>1.72</td><td>0%</td></tr>
+            <tr><td>3</td><td>0.76</td><td>0.78</td><td>0%</td></tr>
+            <tr><td>4</td><td>0.95</td><td>0.98</td><td>0%</td></tr>
+            <tr><td>5</td><td>0.82</td><td>0.90</td><td>0%</td></tr>
+            <tr><td>6</td><td>1.26</td><td>1.51</td><td>0%</td></tr>
+            <tr><td>7</td><td>0.87</td><td>0.98</td><td>0%</td></tr>
+            <tr><td>8</td><td>0.75</td><td>0.75</td><td>0%</td></tr>
+            <tr><td>9</td><td>0.79</td><td>0.82</td><td>0%</td></tr>
+            <tr><td>10</td><td>0.88</td><td>0.92</td><td>0%</td></tr>
+            <tr class="highlight"><td>평균 (2~10회)</td><td>0.96</td><td>1.04</td><td>0%</td></tr>
+          </tbody>
+        </table>
+        <p class="body-text" style="margin-top:12px;">1회차는 Vercel cold start로 간주하여 제외하였습니다. 2~10회차 평균을 베이스라인으로 설정하였습니다.</p>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">점진적 부하 테스트</div>
+        <table>
+          <thead><tr><th>지표</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td>avg</td><td class="num-val">778ms</td></tr>
+            <tr><td>p95</td><td class="num-val">929ms</td></tr>
+            <tr><td>에러율</td><td>0%</td></tr>
+            <tr class="highlight"><td>CPU max</td><td>12.9%</td></tr>
+            <tr class="highlight"><td>SQS Backlog</td><td>지속적으로 증가</td></tr>
+          </tbody>
+        </table>
+        <div class="placeholder"><img src="/assets/images/bottleneck_experiments/v2/v2-cpu-graph.png" alt="v1.1 CPU 그래프" style="width:100%; display:block; border-radius:4px;"></div>
+        <p class="body-text" style="margin-top:16px;">부하가 증가함에 따라 SQS의 대기 메시지 수가 지속적으로 증가하였으며, 테스트 종료 시점에도 처리되지 않은 메시지가 남아 있는 것을 확인하였습니다.</p>
+        <div class="placeholder"><img src="/assets/images/bottleneck_experiments/v2/v2-oldestmessage.png" alt="v1.1 queue graph" style="width:100%; display:block; border-radius:4px;"></div>
+      </div>
+    </section>
+
+    <!-- 5. 판단 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">05</div>
+        <div class="sec-title">판단 및 이유</div>
+      </div>
+      <p class="body-text">Queue 도입 이후에는 기존에 발생했던 CPU 포화나 EC2 인스턴스 장애가 발생하지 않았습니다.</p>
+      <p class="body-text" style="margin-top:12px;">그러나 SQS에는 처리되지 않은 메시지가 지속적으로 누적되었으며, 가장 오래 대기한 메시지의 대기 시간도 계속 증가하였습니다.</p>
+      <p class="body-text" style="margin-top:12px;">이를 통해 <strong>여전히 Worker의 처리 속도가 요청의 유입 속도를 따라가지 못하고 있으며</strong>, 현재 시스템의 한계가 <strong>Worker의 처리량</strong>에 있다고 판단하였습니다.</p>
+    </section>
+
+    <!-- 6. 개선 방향 -->
+    <section>
+      <div class="sec-head">
+        <div class="num">06</div>
+        <div class="sec-title">개선 방향</div>
+      </div>
+      <p class="body-text">Worker의 수를 증가시켜 처리량을 개선하는 방향으로 개선 방향을 결정하였습니다.</p>
+    </section>
+
+    <div class="next">
+      <a href="v1.0.html" class="next-btn">prev<b>v1.0 — 빠른 구현을 위한 초기 아키텍처</b></a>
+      <a href="v1.2.html" class="next-btn">next up<b>v1.2 — 정적 자산 캐싱 도입</b></a>
+    </div>
+
+  </div>
+</body>
+</html>
