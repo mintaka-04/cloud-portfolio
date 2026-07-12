@@ -6,7 +6,7 @@ export default {
   status: 'shipped',
   tags: ['SQS', 'Queue'],
   prev: '1.0',
-  next: '1.2',
+  next: '2.0',
 
   sections: [
 
