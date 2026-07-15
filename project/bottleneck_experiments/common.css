@@ -169,7 +169,7 @@ tr.highlight td{ color: var(--accent); font-weight:500; }
   display: none;
   position: absolute;
   left: 22px; top: 50%; transform: translateY(-50%);
-  width: 280px;
+  width: 336px;
   background: var(--ink);
   color: var(--paper);
   font-family: 'Inter', sans-serif;
@@ -211,6 +211,10 @@ tr.highlight td{ color: var(--accent); font-weight:500; }
 }
 .placeholder.has-image{ padding: 0; }
 .placeholder.has-image img{ border-radius: 0; }
+
+.image-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;
+}
 
 .next{
   margin-top: 0;

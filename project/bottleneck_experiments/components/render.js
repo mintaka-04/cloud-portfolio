@@ -16,6 +16,13 @@ export function imageUrl(src, alt = '') {
   return `<div class="placeholder has-image"><img src="${src}" alt="${alt}" style="width:100%;display:block;"></div>`;
 }
 
+export function imageGrid(images) {
+  // images: [{src, alt}, {src, alt}]
+  return `<div class="image-grid">${images.map(({ src, alt = '' }) =>
+    `<div class="placeholder has-image"><img src="${src}" alt="${alt}" style="width:100%;display:block;"></div>`
+  ).join('')}</div>`;
+}
+
 export function badge(label, content, marginTop = 16) {
   // content: 문자열 또는 블록 HTML
   return `

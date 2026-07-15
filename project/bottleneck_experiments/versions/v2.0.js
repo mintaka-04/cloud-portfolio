@@ -3,10 +3,10 @@ import { section, text, image, imageUrl, subLabel, badge, table, criteriaGrid } 
 export default {
   version: 'v2.0',
   title: 'ECS Fargate 전환 및 Auto Scaling 적용',
-  status: 'in progress',
+  status: 'shipped',
   tags: ['ECS', 'AWS Fargate', 'Auto Scaling', 'Supabase Realtime'],
   prev: '1.1',
-  next: null,
+  next: '3.0',
 
   sections: [
 
