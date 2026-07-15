@@ -135,6 +135,17 @@ tr.highlight td{ color: var(--accent); font-weight:500; }
   padding: 4px 0; border-bottom:1px solid var(--line); line-height:1.5;
 }
 .criteria-box ul li:last-child{ border-bottom:none; }
+.new-tag{
+  display:inline-block;
+  font-family:'JetBrains Mono', monospace;
+  font-size: 9px; font-weight:400; letter-spacing:.04em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
 
 .tooltip-wrap{
   position: relative;
@@ -182,6 +193,9 @@ tr.highlight td{ color: var(--accent); font-weight:500; }
   margin-bottom: 10px;
 }
 .badge-content{ padding-left: 16px; }
+.badge-content ul{ list-style: disc; padding-left: 18px; margin-top: 4px; }
+.badge-content li{ font-size: 14px; line-height: 1.7; color: var(--ink); }
+.badge-content li + li{ margin-top: 2px; }
 
 .placeholder{
   border: 1px dashed var(--line);

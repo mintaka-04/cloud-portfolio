@@ -16,10 +16,10 @@ export function imageUrl(src, alt = '') {
   return `<div class="placeholder has-image"><img src="${src}" alt="${alt}" style="width:100%;display:block;"></div>`;
 }
 
-export function badge(label, content) {
+export function badge(label, content, marginTop = 16) {
   // content: 문자열 또는 블록 HTML
   return `
-<div class="sub-section" style="margin-top:16px;">
+<div class="sub-section" style="margin-top:${marginTop}px;">
   <div class="badge">${label}</div>
   <div class="badge-content">${content}</div>
 </div>`;
