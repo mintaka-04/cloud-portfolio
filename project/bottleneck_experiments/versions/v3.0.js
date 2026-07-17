@@ -80,7 +80,7 @@ export default {
     // 05 판단 및 이유
     section(5, '판단 및 이유', `
       ${text([
-        'Event Queue의 Backlog 증가와 ApproximateNumberOfMessagesNotVisible 값이 1 수준으로 유지된 것을 통해 Rule Worker 처리량 부족을 확인하였습니다.',
+        'Event Queue의 Backlog 증가와 ApproximateNumberOfMessagesNotVisible 값이 1 수준으로 유지된 것을 통해 <strong>Rule Worker 처리량 부족</strong>을 확인하였습니다.',
         '확인 결과 rule-worker는 단일 프로세스로 동작하고 있어 동시에 처리 가능한 작업 수가 제한되어 있었으며, 이로 인해 이벤트 유입량이 처리량을 초과한 것으로 판단하였습니다.',
         '이에 따라 ai-queue로 전달되는 이벤트 생성 속도 역시 제한되었고, ai-queue에서 테스트 종료 이후 auto scaling이 발생한 것 역시 이러한 이유 때문으로 판단하였습니다.',
       ])}
@@ -89,7 +89,7 @@ export default {
     // 06 개선 방향
     section(6, '개선 방향', `
       ${text([
-        '따라서 rule-worker의 처리량을 개선하는 방향으로 다음 버전을 진행하기로 결정하였습니다.',
+        '따라서 rule-worker의 <strong>처리량을 개선</strong>하는 방향으로 다음 버전을 진행하기로 결정하였습니다.',
       ])}
     `),
   ]

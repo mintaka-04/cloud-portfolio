@@ -175,7 +175,7 @@ export default {
       <p class="body-text" style="margin-top:24px;">더 정확한 원인을 파악하기 위해 Slow Queries 분석 결과, realtime.list_changes 쿼리가 가장 큰 비중을 차지하는 것을 확인할 수 있었습니다.</p>
       ${text([
         '해당 쿼리는 Supabase Realtime이 WAL 기반 변경 감지를 위해 지속적으로 실행하는 내부 쿼리이며, 현재 버전은 Vercel에서 API를 통해 특정 테이블의 데이터가 변경되면 Supabase Realtime이 이를 감지하여 Main 서비스로 전달하는 방식으로 구성되어있습니다.',
-        '즉, 부하 상황에서 realtime.list_changes 쿼리가 DB 리소스를 지속적으로 사용하면서 다른 요청의 처리가 지연되었을 가능성이 높은 것으로 판단하였습니다.',
+        '즉, 부하 상황에서 <strong>realtime.list_changes 쿼리가 DB 리소스를 지속적으로 사용하면서 다른 요청의 처리가 지연</strong>되었을 가능성이 높은 것으로 판단하였습니다.',
         '그 결과 요청이 증가 -> DB 처리가 지연 -> PostgREST의 worker 점유가 지속 -> 내부 요청 누적 -> timeout 발생의 흐름으로 문제가 발생한 것으로 판단하였습니다.',
       ])}
     `),
@@ -184,7 +184,7 @@ export default {
     section(6, '개선 방향', `
       ${text([
         '해당 버전은 Supabase Realtime을 이벤트 트리거로 사용하고 있어 이벤트 처리 과정이 DB와 강하게 결합되어 있었습니다.',
-        '따라서 DB는 데이터 저장에 집중하고 이벤트 처리는 별도로 수행할 수 있도록 Realtime 기반 트리거를 제거한 뒤 이벤트를 메시지 큐에 적재하는 구조로 개선하기로 결정하였습니다.',
+        '따라서 DB는 데이터 저장에 집중하고 이벤트 처리는 별도로 수행할 수 있도록 <strong>Realtime 기반 트리거를 제거한 뒤 이벤트를 메시지 큐에 적재</strong>하는 구조로 개선하기로 결정하였습니다.',
       ])}
     `),
   ]
