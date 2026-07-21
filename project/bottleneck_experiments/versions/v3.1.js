@@ -3,10 +3,10 @@ import { section, text, image, imageUrl, imageGrid, subLabel, badge, table, crit
 export default {
   version: 'v3.1',
   title: 'Rule-worker Coroutine 적용 및 Auto Scaling 도입',
-  status: 'in progress',
+  status: 'shipped',
   tags: ['Coroutine', 'Auto Scaling', 'DB Connection Pool'],
   prev: '3.0',
-  next: null,
+  next: '3.2',
 
   sections: [
 
@@ -217,7 +217,7 @@ export default {
     section(6, '개선 방향', `
       ${text([
         '현재 구조에서는 rule-worker의 task 수를 증가시키는 것만으로는 병목을 해결할 수 없다고 판단하였습니다.',
-        '따라서 메시지 처리 과정의 DB 호출 수를 줄이는 방향으로 구조를 개선하고 필요시 Connection Pool Size 조정을 검토하기로 결정하였습니다.',
+        '따라서 단일 메시지 처리 과정의 DB 요청을 줄이는 방향으로 구조를 개선하고, 병목으로 확인된 DB Connection Pool Size의 조정도 검토하기로 결정하였습니다.',
       ])}
     `),
   ]
