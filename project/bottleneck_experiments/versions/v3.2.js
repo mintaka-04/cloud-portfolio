@@ -3,10 +3,10 @@ import { section, text, image, imageUrl, imageGrid, subLabel, badge, table, crit
 export default {
   version: 'v3.2',
   title: 'PostgREST 제거 및 CTE 기반 쿼리 최적화',
-  status: 'in progress',
+  status: 'shipped',
   tags: ['asyncpg', 'CTE', 'DB Connection Pooler'],
   prev: '3.1',
-  next: null,
+  next: '4.0',
 
   sections: [
 
