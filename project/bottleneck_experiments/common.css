@@ -210,7 +210,27 @@ tr.highlight td{ color: var(--accent); font-weight:500; }
   overflow: hidden;
 }
 .placeholder.has-image{ padding: 0; }
-.placeholder.has-image img{ border-radius: 0; }
+.placeholder.has-image img{ border-radius: 0; cursor: zoom-in; }
+
+.lightbox-overlay{
+  position: fixed; inset: 0;
+  background: rgba(27,36,48,.86);
+  display: flex; align-items:center; justify-content:center;
+  padding: 40px;
+  z-index: 999;
+  cursor: zoom-out;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease;
+}
+.lightbox-overlay.open{ opacity: 1; pointer-events: auto; }
+.lightbox-overlay img{
+  max-width: 92vw;
+  max-height: 92vh;
+  border-radius: 4px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  cursor: zoom-out;
+}
 
 .image-grid{
   display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;

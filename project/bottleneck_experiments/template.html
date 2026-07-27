@@ -63,6 +63,25 @@
       }
       nav.innerHTML = navHTML;
     }
+
+    // 이미지 라이트박스 (클릭 시 확대, 다시 클릭 시 원상태)
+    const lightbox = document.createElement('div');
+    lightbox.className = 'lightbox-overlay';
+    const lightboxImg = document.createElement('img');
+    lightbox.appendChild(lightboxImg);
+    document.body.appendChild(lightbox);
+
+    document.getElementById('page-content').addEventListener('click', e => {
+      const img = e.target.closest('.placeholder.has-image img');
+      if (!img) return;
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightbox.classList.add('open');
+    });
+    lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') lightbox.classList.remove('open');
+    });
   </script>
 </body>
 </html>
