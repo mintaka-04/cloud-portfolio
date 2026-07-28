@@ -106,7 +106,7 @@ export default {
           <div style="margin-top:20px;">
             ${imageUrl('../../assets/images/bottleneck_experiments/v7/v7-ai-queue-task-count.png', 'ai-queue Task Count 그래프')}
           </div>
-          <p class="body-text" style="margin-top:12px;">부하가 지속됨에 따라 Number Of Messages Sent와 Number Of Messages Deleted간 격차가 지속적으로 확대되는 것을 확인할 수 있었습니다. 또한 Approximate Age Of Oldest Message는 최대 10.5분까지 증가했으며 Approximate Number Of Messages Visible가 테스트 시작 시점 107건에서 최대 8030건까지 선형적으로 증가했습니다. Live Task Count 확인 결과 4개, 7개, 10개로 단계적으로 확장되는 것을 확인할 수 있었습니다.</p>
+          <p class="body-text" style="margin-top:12px;">부하가 지속됨에 따라 Number Of Messages Sent와 Number Of Messages Deleted간 격차가 지속적으로 확대되는 것을 확인할 수 있었습니다. 또한 Approximate Age Of Oldest Message는 최대 10.5분까지 증가했으며 Approximate Number Of Messages Visible가 최대 8030건까지 선형적으로 증가했습니다. Live Task Count 확인 결과 4개, 7개, 10개로 단계적으로 확장되는 것을 확인할 수 있었습니다.</p>
         `)}
         ${badge('ai-worker 관련 cloudwatch 지표', `
           ${imageUrl('../../assets/images/bottleneck_experiments/v7/v7-ai-worker-cpu-memory.png', 'ai-worker CPU/Memory 그래프')}
