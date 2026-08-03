@@ -3,10 +3,10 @@ import { section, text, image, imageUrl, imageGrid, subLabel, badge, table, crit
 export default {
   version: 'v4.1',
   title: 'OpenAI Rate Limit 대응 및 Auto Scaling 정책 개선',
-  status: 'in progress',
+  status: 'shipped',
   tags: ['OpenAI Rate Limit', 'Concurrency', 'Auto Scaling'],
   prev: '4.0',
-  next: null,
+  next: '4.2',
 
   sections: [
 

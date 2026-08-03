@@ -20,6 +20,8 @@
     <div class="next" id="page-nav"></div>
   </div>
 
+  <nav class="toc" id="page-toc"></nav>
+
   <script type="module">
     // URL에서 버전 읽기 (?v=1.0 또는 파일명에서)
     const params = new URLSearchParams(location.search);
@@ -62,6 +64,38 @@
         navHTML += `<a href="template.html?v=${page.next}" class="next-btn next-btn-next">next up<b>v${page.next}</b><span class="next-btn-title">${nextTitle}</span></a>`;
       }
       nav.innerHTML = navHTML;
+
+      buildTOC();
+    }
+
+    // 우측 고정 목차 (섹션 이동 + 스크롤 위치에 따른 활성 표시)
+    function buildTOC() {
+      const toc = document.getElementById('page-toc');
+      const sections = [...document.querySelectorAll('#page-content section')];
+
+      if (!sections.length) {
+        toc.innerHTML = '';
+        return;
+      }
+
+      toc.innerHTML = sections.map(sec => {
+        const num = sec.querySelector('.num')?.textContent ?? '';
+        const title = sec.querySelector('.sec-title')?.textContent ?? '';
+        return `<a href="#${sec.id}" class="toc-item" data-target="${sec.id}"><span class="toc-num">${num}</span><span class="toc-label">${title}</span></a>`;
+      }).join('');
+
+      const links = [...toc.querySelectorAll('.toc-item')];
+      const setActive = id => {
+        links.forEach(l => l.classList.toggle('active', l.dataset.target === id));
+      };
+      setActive(sections[0].id);
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+      sections.forEach(sec => observer.observe(sec));
     }
 
     // 이미지 라이트박스 (클릭 시 확대, 다시 클릭 시 원상태)

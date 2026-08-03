@@ -75,7 +75,7 @@ export function criteriaGrid({ left, right }) {
 export function section(num, title, content) {
   const pad = String(num).padStart(2, '0');
   return `
-<section>
+<section id="section-${pad}">
   <div class="sec-head">
     <div class="num">${pad}</div>
     <div class="sec-title">${title}</div>
