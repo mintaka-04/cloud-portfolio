@@ -3,10 +3,10 @@ import { section, text, image, imageUrl, imageGrid, subLabel, badge, table, crit
 export default {
   version: 'v4.2',
   title: 'Auto Scaling Scale-out 정책 지표 변경',
-  status: 'in progress',
+  status: 'shipped',
   tags: ['Auto Scaling', 'CPU Utilization', 'NumberOfMessagesSent'],
   prev: '4.1',
-  next: null,
+  next: '4.3',
 
   sections: [
 

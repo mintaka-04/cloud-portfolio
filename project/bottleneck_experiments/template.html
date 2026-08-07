@@ -40,7 +40,7 @@
 
     async function render(page) {
       document.title = `${page.version} — ${page.title}`;
-      document.getElementById('page-eyebrow').textContent = `${page.version} — ${page.status}`;
+      document.getElementById('page-eyebrow').textContent = page.version;
       document.getElementById('page-heading').textContent = page.title;
 
       // 태그
