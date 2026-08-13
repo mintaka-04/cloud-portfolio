@@ -3,10 +3,10 @@ import { section, text, image, imageUrl, imageGrid, subLabel, badge, table, crit
 export default {
   version: 'v4.3',
   title: 'Auto Scaling Scale-in 정책 지표 변경 및 개선',
-  status: 'in progress',
+  status: 'shipped',
   tags: ['Auto Scaling', 'CloudWatch'],
   prev: '4.2',
-  next: null,
+  next: '5.0',
 
   sections: [
 
