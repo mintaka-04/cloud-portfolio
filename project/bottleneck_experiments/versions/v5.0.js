@@ -6,7 +6,7 @@ export default {
   status: 'shipped',
   tags: ['Soak Test', 'AWS RDS', 'DB Connection Pool'],
   prev: '4.3',
-  next: null,
+  next: '5.1',
 
   sections: [
 
