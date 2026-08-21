@@ -91,12 +91,15 @@ export default {
           { cells: ['합계', '-', '-', '126'], numVal: true, highlight: true },
         ]
       })}
-      <p class="body-text" style="margin-top:12px;">하지만 해당 문제를 해결하기 위해 RDS 인스턴스를 변경하거나 max_connections 자체를 늘리는 방향은 선택하지 않았습니다. RDS 인스턴스를 업그레이드하는 것은 추가적인 인프라 비용이 발생하며, 현재 구조처럼 각 서비스의 Connection 사용량 자체가 통제되지 않은 상태에서는 동일한 문제가 재발할 가능성이 있다고 판단했기 때문입니다.</p>
     `),
 
     // 05 개선 방향
     section(5, '개선 방향', `
-      ${text('이번 Soak Test를 통해 장시간 부하 상황에서 DB 연결 수가 RDS의 Connection Capacity에 도달하여 FATAL 에러가 발생하는 것을 확인하였고, 이는 서비스별로 DB Connection 사용량이 적절히 통제되지 않았기 때문이라고 판단했습니다. 따라서 DB Connection 사용량을 재점검하여 Connection Pool 크기와 Task 수를 조정하는 방향으로 개선하기로 결정했습니다.')}
+      ${text([
+        '이번 Soak Test를 통해 장시간 부하 상황에서 DB 연결 수가 RDS의 Connection Capacity에 도달하여 FATAL 에러가 발생하는 것을 확인하였고, 이는 서비스별로 DB Connection 사용량이 적절히 통제되지 않았기 때문이라고 판단했습니다.',
+        '하지만 해당 문제를 해결하기 위해 RDS 인스턴스를 변경하거나 max_connections 자체를 늘리는 방향은 선택하지 않았습니다. RDS 인스턴스를 업그레이드하는 것은 추가적인 인프라 비용이 발생하며, 현재 구조처럼 각 서비스의 Connection 사용량 자체가 통제되지 않은 상태에서는 동일한 문제가 재발할 가능성이 있다고 판단했기 때문입니다.',
+        '따라서 RDS Connection Capacity의 한계 내에서 각 서비스별 Connection Pool 및 Task 구성을 조정하는 방향으로 개선하기로 결정하였습니다.',
+      ])}
     `),
   ]
 };

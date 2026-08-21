@@ -35,9 +35,9 @@ export default {
     section(3, '실험 설계', `
       ${text([
         '테스트 시나리오와 사용 데이터는 이전과 동일하게 유지하였습니다.',
-        '하지만 rule-worker에 autoscaling을 적용함에 따라 초기 설정이 필요했고, 이를 위해 Coroutine만 적용한 상태에서 rule-worker 1대의 처리량을 측정하였습니다. 이후 측정 결과를 바탕으로 autoscaling 초기 설정을 적용한 뒤 부하테스트를 수행하였습니다.',
+        '하지만 rule-worker에 autoscaling을 적용함에 따라 설정이 필요했고, 이를 위해 Coroutine만 적용한 상태에서 rule-worker 1대의 처리량을 측정하였습니다. 이후 측정 결과를 바탕으로 autoscaling 설정을 적용한 뒤 부하테스트를 수행하였습니다.',
       ])}
-      ${subLabel('Auto Scaling 초기 설정', `
+      ${subLabel('Auto Scaling 설정', `
         ${imageUrl('../../assets/images/bottleneck_experiments/v5/v5-noautoscaling-notvisible.png', 'Auto Scaling 미적용 상태 Approximate Number Of Messages Not Visible 그래프')}
         <div style="margin-top:20px;">
           ${text([
@@ -51,7 +51,7 @@ export default {
           ])}
         </div>
         ${table({
-          head: ['항목', '초기 설정'],
+          head: ['항목', '설정'],
           rows: [
             { cells: ['Scale-out/in Threshold', '204/50'] },
             { cells: ['허용 시간', '30초'] },
