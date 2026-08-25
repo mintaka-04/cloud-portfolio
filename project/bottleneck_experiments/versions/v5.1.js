@@ -62,6 +62,9 @@ export default {
           '앞서 설계한 ai-worker Task 10 × Pool 3 구성이 실제로 Connection 여유를 만드는지 검증하기 위해 기존과 동일한 조건(50 VU, 30분 유지)에서 Soak Test를 수행하였습니다.',
         ])}
         ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-rds-db-connection-0809.png', '0809 Soak Test RDS DatabaseConnections 그래프')}
+        <div style="margin-top:16px;">
+          ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-connection-monitor-0809.png', '0809 pg_stat_activity 기반 5초 단위 RDS Connection 모니터링 그래프')}
+        </div>
         ${note(`2026-08-09 07:35:42 UTC:172.31.22.212(54584):moodotclone_adm@postgres:[27165]:FATAL:  remaining connection slots are reserved for roles with privileges of the "rds_reserved" role<br>
 ... (총 125회 반복)<br>
 <br>
@@ -79,6 +82,9 @@ export default {
           '1차 검증 결과에 따라 ai-worker의 Task를 10에서 9까지 추가로 축소하고 Pool Max는 3으로 유지하여 동일한 조건으로 Soak Test를 다시 수행하였습니다.',
         ])}
         ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-rds-db-connection-0810.png', '0810 Soak Test RDS DatabaseConnections 그래프')}
+        <div style="margin-top:16px;">
+          ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-connection-monitor-0810.png', '0810 pg_stat_activity 기반 5초 단위 RDS Connection 모니터링 그래프')}
+        </div>
         ${note(`2026-08-10 11:03:27 UTC:172.31.22.212(42206):moodotclone_adm@postgres:[2884]:FATAL:  remaining connection slots are reserved for roles with privileges of the "rds_reserved" role<br>
 ... (총 125회 반복)`)}
         <div style="margin-top:16px;">
@@ -89,11 +95,52 @@ export default {
         ])}
         </div>
       `)}
+      ${subLabel('AI-Worker Connection 구조 검토', `
+        ${text([
+          'ai-worker 구현 코드를 확인한 결과 DB Connection은 상태 조회 및 갱신과 같은 짧은 구간에서만 사용되고, 실제로 시간이 오래 걸리는 LLM 응답 대기 구간에는 Connection을 점유하지 않는다는 것을 확인하였습니다. 따라서 Pool Max는 LLM 동시 호출 수와 동일하게 유지할 필요가 없으며, 현재 max_size = 3으로 설정된 Pool은 Connection 사용 패턴을 고려할 때 축소하더라도 처리에 미치는 영향이 크지 않을 것으로 판단하였습니다.',
+        ])}
+      `)}
+      ${subLabel('최종 테스트 구성', `
+        ${text([
+          'AI-Worker Connection 구조 검토 결과에 따라 Task는 9로 유지하고 Pool Max를 3에서 2로 축소하였으며, 이를 통해 이론상 최대 Connection 합계를 10 + 36 + 18 = 64까지 낮출 수 있도록 구성하였습니다.',
+        ])}
+        ${table({
+          head: ['구분', 'ai-worker Task', 'ai-worker Pool', '이론상 최대 Connection', 'FATAL 총건수'],
+          rows: [
+            { cells: ['v5.0', '20', '4', '126', '2,576'] },
+            { cells: ['1차 조정', '10', '3', '76', '157'] },
+            { cells: ['2차 조정', '9', '3', '73', '125'] },
+            { cells: ['최종 테스트 구성', '9', '2', '64', '-'], highlight: true },
+          ]
+        })}
+        <div style="margin-top:16px;">
+        ${text([
+          '최종 구성의 효과를 확인하기 위해 기존과 동일한 조건(50 VU, 30분 유지, k6)으로 Soak Test를 수행하였습니다.',
+        ])}
+        </div>
+      `)}
     `),
 
     // 04 실험 결과
     section(4, '실험 결과', `
-      ${text('')}
+      ${subLabel('Soak 테스트', `
+        ${badge('애플리케이션 지표', `
+          ${table({
+            head: ['지표', '결과'],
+            rows: [
+              { cells: ['avg', '0.85'] },
+              { cells: ['p95', '1.00'] },
+              { cells: ['에러율', '0.0%'] },
+            ]
+          })}
+        `)}
+        ${badge('RDS 지표', `
+          ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-rds-db-connection-0812.png', 'RDS DB Connections 그래프')}
+        `, 32)}
+        <div style="margin-top:16px;">
+          ${text('RDS Connection은 5초 단위 모니터링 기준 최대 74(RDS 한도 79 중)까지 상승하였으며, 테스트 기간 동안 FATAL은 한 건도 발생하지 않았습니다.')}
+        </div>
+      `)}
     `),
 
     // 05 판단 및 이유
