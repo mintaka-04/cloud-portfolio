@@ -14,7 +14,7 @@ export default {
     section(1, '아키텍처', `
       ${text([
         'EC2 기반으로 동작하던 인스턴스들을 ECS Fargate 기반의 아키텍처로 전환하였습니다.',
-        'Main은 단일 Task로 유지하였으며, Worker는 ECS Service로 구성하여 부하에 따라 수가 자동으로 증감하도록 Autoscaling을 적용하였습니다.',
+        'Main은 단일 Task로 유지하였으며, Worker는 ECS Service로 구성하여 부하에 따라 수가 자동으로 증감하도록 Auto Scaling을 적용하였습니다.',
       ])}
       ${imageUrl('../../assets/images/bottleneck_experiments/v3/v3-diagram.png', 'v2.0 아키텍처 다이어그램')}
     `),
@@ -38,7 +38,7 @@ export default {
       ${text([
         '테스트 시나리오와 사용 데이터는 이전과 동일하게 유지하였습니다.',
         '하지만 구조가 변경됨에 따라 추가적인 관찰 지표가 필요하다고 판단해 다음과 같이 관찰 지표와 판단 기준을 추가하였습니다.',
-        '또한 autoscaling 정책은 CPU가 안정적으로 유지되었던 Worker 2개 환경 테스트 결과를 바탕으로 초기값을 설정하였습니다.',
+        '또한 Auto Scaling 정책은 CPU가 안정적으로 유지되었던 Worker 2개 환경 테스트 결과를 바탕으로 초기값을 설정하였습니다.',
       ])}
       ${subLabel('테스트 상세', `
         ${badge('베이스라인 테스트', '<p class="body-text">단일 사용자가 사용한다는 가정 하에 기본 성능을 측정하였습니다.</p>')}

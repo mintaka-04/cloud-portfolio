@@ -43,6 +43,9 @@ export default {
         ${note(`2026-08-07 06:49:32 UTC:172.31.8.184(59334):moodotclone_adm@postgres:[26661]:FATAL:  remaining connection slots are reserved for roles with privileges of the "rds_reserved" role<br>
 ... (총 2,437회 반복)<br>
 <br>
+2026-08-07 06:50:46 UTC:172.31.22.212(50336):moodotclone_adm@postgres:[26807]:FATAL:  remaining connection slots are reserved for roles with the SUPERUSER attribute<br>
+... (총 131회 반복)<br>
+<br>
 2026-08-07 06:56:08 UTC:172.31.22.212(53432):moodotclone_adm@postgres:[27549]:FATAL:  sorry, too many clients already<br>
 ... (총 8회 반복)`)}
         <div style="margin-top:16px;">

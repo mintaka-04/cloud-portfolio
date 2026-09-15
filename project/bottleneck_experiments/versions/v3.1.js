@@ -35,7 +35,7 @@ export default {
     section(3, '실험 설계', `
       ${text([
         '테스트 시나리오와 사용 데이터는 이전과 동일하게 유지하였습니다.',
-        '하지만 rule-worker에 autoscaling을 적용함에 따라 설정이 필요했고, 이를 위해 Coroutine만 적용한 상태에서 rule-worker 1대의 처리량을 측정하였습니다. 이후 측정 결과를 바탕으로 autoscaling 설정을 적용한 뒤 부하테스트를 수행하였습니다.',
+        '하지만 rule-worker에 Auto Scaling을 적용함에 따라 설정이 필요했고, 이를 위해 Coroutine만 적용한 상태에서 rule-worker 1대의 처리량을 측정하였습니다. 이후 측정 결과를 바탕으로 Auto Scaling 설정을 적용한 뒤 부하테스트를 수행하였습니다.',
       ])}
       ${subLabel('Auto Scaling 설정', `
         ${imageUrl('../../assets/images/bottleneck_experiments/v5/v5-noautoscaling-notvisible.png', 'Auto Scaling 미적용 상태 Approximate Number Of Messages Not Visible 그래프')}
@@ -122,7 +122,7 @@ export default {
             })}
             <div style="margin-top:20px;">
               ${text([
-                'AutoScaling이 부하 증가에 따라 정상적으로 동작해 rule-worker task 수가 최대 9까지 증가했습니다.',
+                'Auto Scaling이 부하 증가에 따라 정상적으로 동작해 rule-worker task 수가 최대 9까지 증가했습니다.',
                 '하지만 ApproximateNumberOfMessagesVisible는 테스트 후반부까지 지속적으로 증가하며 Backlog가 누적되었습니다.',
               ])}
             </div>
@@ -159,7 +159,7 @@ export default {
         <div style="margin-top:20px;">
           ${text([
             'NumberOfMessagesDeleted 그래프에서 단일 rule-worker였던 베이스라인 테스트 결과 최대 274msg/분의 처리량을 확인할 수 있었습니다.',
-            '하지만 점진적 부하 테스트에서는 rule-worker에 autoscaling이 적용되어 최대 task가 9개까지 증가했음에도 테스트 중 최대 처리량은 233건/분이었으며, 100VU 구간에서는 오히려 감소하는 경향이 나타났습니다. 그리고 테스트 종료 이후에 처리량이 다시 273건/분 정도로 회복되었습니다.',
+            '하지만 점진적 부하 테스트에서는 rule-worker에 Auto Scaling이 적용되어 최대 task가 9개까지 증가했음에도 테스트 중 최대 처리량은 233건/분이었으며, 100VU 구간에서는 오히려 감소하는 경향이 나타났습니다. 그리고 테스트 종료 이후에 처리량이 다시 273건/분 정도로 회복되었습니다.',
             '즉, Rule-worker의 task 수는 증가했지만 처리량은 이에 비례하여 증가하지 않았다는 것을 확인할 수 있었습니다.',
           ])}
         </div>
