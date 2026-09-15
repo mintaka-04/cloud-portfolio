@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Engineering Log</title>
+<title>Bottleneck Experiments</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -34,18 +34,8 @@
     padding: 56px 24px 120px;
     position: relative;
   }
-  /* corner crop marks */
-  .crop{position:fixed; width:18px; height:18px; opacity:.55; z-index:5;}
-  .crop::before,.crop::after{content:'';position:absolute;background:var(--ink-soft);}
-  .crop::before{width:18px;height:1px;top:0;left:0;}
-  .crop::after{width:1px;height:18px;top:0;left:0;}
-  .crop.tl{top:14px;left:14px;}
-  .crop.tr{top:14px;right:14px; transform:scaleX(-1);}
-  .crop.bl{bottom:14px;left:14px; transform:scaleY(-1);}
-  .crop.br{bottom:14px;right:14px; transform:scale(-1,-1);}
 
   header{
-    display:flex; justify-content:space-between; align-items:flex-end;
     border-bottom: 2px solid var(--ink);
     padding-bottom: 18px;
     margin-bottom: 8px;
@@ -71,113 +61,62 @@
     font-size: 34px;
     letter-spacing: -0.01em;
   }
-  .meta-top{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-soft);
-    text-align:right;
-    line-height:1.6;
-  }
   .sub{
     font-size: 14px;
     color: var(--ink-soft);
     margin: 14px 0 48px;
-    max-width: 480px;
+    max-width: 520px;
   }
 
-  .log{
-    position: relative;
-    padding-left: 28px;
+  .nav-grid{
+    display:grid;
+    gap: 16px;
   }
-  .log::before{
-    content:'';
-    position:absolute;
-    left: 5px; top: 6px; bottom: 6px;
-    width: 1px;
-    background: repeating-linear-gradient(to bottom, var(--ink-soft) 0 4px, transparent 4px 8px);
-    opacity:.5;
-  }
-  .entry{
+  .nav-card{
     position: relative;
-    padding: 22px 0;
-    border-bottom: 1px solid var(--line);
     display:block;
+    padding: 24px 26px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: rgba(255,255,255,.5);
     text-decoration:none;
     color:inherit;
-    transition: padding-left .18s ease;
+    transition: border-color .15s, padding-left .18s ease;
   }
-  .entry:last-child{ border-bottom:none; }
-  .entry::before{
-    content:'';
-    position:absolute;
-    left: -28px; top: 28px;
-    width: 11px; height:11px;
-    border-radius:50%;
-    background: var(--paper);
-    border: 2px solid var(--ink);
+  .nav-card:hover{
+    border-color: var(--accent);
+    padding-left: 34px;
   }
-  .entry.active::before{ background: var(--accent); border-color: var(--accent); }
-  .entry:hover{ padding-left: 8px; }
-  .entry:hover .ver{ color: var(--accent); }
-
-  .row1{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
-  .ver{
+  .nav-card:hover .nav-title{ color: var(--accent); }
+  .nav-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing:.06em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .nav-title{
     font-family:'Space Grotesk', sans-serif;
     font-weight:700;
-    font-size: 22px;
-    transition: color .15s;
-    text-shadow: 0 0 6px var(--paper), 0 0 6px var(--paper);
-  }
-  .status{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing:.06em;
-    padding: 3px 8px;
-    border: 1px solid var(--ink);
-    border-radius: 3px;
-    text-transform: uppercase;
-    transform: rotate(-2deg);
-  }
-  .status.live{ border-color:var(--accent); color:var(--accent); }
-  .status.done{ color: var(--ink-soft); border-color: var(--ink-soft); }
-  .date{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-soft);
-    margin-left:auto;
-  }
-  .title{
-    font-size: 15px;
-    color: var(--ink-soft);
+    font-size: 20px;
     margin-top: 6px;
-    max-width: 560px;
-    text-shadow: 0 0 5px var(--paper), 0 0 5px var(--paper);
+    transition: color .15s;
   }
-  .stack{
-    display:flex; gap:8px; margin-top: 14px; flex-wrap:wrap;
+  .nav-desc{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    max-width: 480px;
   }
-  .chip{
-    display:flex; align-items:center; gap:5px;
+  .nav-arrow{
+    position:absolute;
+    right: 26px; top: 50%;
+    transform: translateY(-50%);
     font-family:'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 4px 9px 4px 7px;
-    border:1px solid var(--line);
-    border-radius: 100px;
-    background: rgba(255,255,255,.5);
-    color: var(--ink);
+    color: var(--ink-soft);
+    font-size: 18px;
   }
-  .chip .ic{
-    width:7px;height:7px;border-radius:2px;background:var(--blue);
-    flex:none;
-  }
-  .chip.acc .ic{ background:var(--accent); }
 
-  .status-note{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    margin-top: 10px;
-  }
   footer{
     margin-top: 64px;
     font-family:'JetBrains Mono', monospace;
@@ -192,165 +131,32 @@
 
   <div class="frame">
     <header>
-      <div>
-        <div class="eyebrow"><span class="dot"></span>engineering log</div>
-        <h1>아키텍처 변경 기록</h1>
-      </div>
+      <div class="eyebrow"><span class="dot"></span>cloud-portfolio</div>
+      <h1>Bottleneck Experiments</h1>
     </header>
-    <p class="sub">버전마다 무엇을 바꿨고, 왜 그렇게 판단했는지를 그대로 남깁니다.</p>
+    <p class="sub">부하 테스트로 병목을 찾고 개선한 과정을 기록한 프로젝트입니다.</p>
 
-    <div class="log">
+    <div class="nav-grid">
 
-      <a class="entry" href="template.html?v=5.1">
-        <div class="row1">
-          <span class="ver">v5.1</span>
-          <span class="status live">in progress</span>
-        </div>
-        <div class="title"></div>
-        <div class="stack">
-        </div>
+      <a class="nav-card" href="log.html">
+        <div class="nav-label">engineering log</div>
+        <div class="nav-title">아키텍처 변경 기록</div>
+        <div class="nav-desc">버전(v1.0 ~ v5.1)마다 무엇을 바꿨고, 왜 그렇게 판단했는지를 그대로 남긴 기록입니다.</div>
+        <div class="nav-arrow">→</div>
       </a>
 
-      <a class="entry" href="template.html?v=5.0">
-        <div class="row1">
-          <span class="ver">v5.0</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">RDS Connection Capacity 한계 확인</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>Soak Test</span>
-          <span class="chip"><span class="ic"></span>AWS RDS</span>
-          <span class="chip"><span class="ic"></span>DB Connection Pool</span>
-        </div>
+      <a class="nav-card" href="diagrams.html">
+        <div class="nav-label">visual history</div>
+        <div class="nav-title">아키텍처 변화</div>
+        <div class="nav-desc">텍스트 없이 다이어그램만으로 아키텍처가 어떻게 바뀌어왔는지 훑어봅니다.</div>
+        <div class="nav-arrow">→</div>
       </a>
 
-      <a class="entry" href="template.html?v=4.3">
-        <div class="row1">
-          <span class="ver">v4.3</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">Auto Scaling Scale-in 정책 지표 변경 및 개선</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>Auto Scaling</span>
-          <span class="chip"><span class="ic"></span>CloudWatch</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=4.2">
-        <div class="row1">
-          <span class="ver">v4.2</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">Auto Scaling Scale-out 정책 지표 변경</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>Auto Scaling</span>
-          <span class="chip"><span class="ic"></span>CPU Utilization</span>
-          <span class="chip"><span class="ic"></span>NumberOfMessagesSent</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=4.1">
-        <div class="row1">
-          <span class="ver">v4.1</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">OpenAI Rate Limit 대응 및 Auto Scaling 정책 개선</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>OpenAI Rate Limit</span>
-          <span class="chip"><span class="ic"></span>Concurrency</span>
-          <span class="chip"><span class="ic"></span>Auto Scaling</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=4.0">
-        <div class="row1">
-          <span class="ver">v4.0</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">AWS RDS 이전 및 DB 접근 구조 개선</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>AWS RDS</span>
-          <span class="chip"><span class="ic"></span>ALB</span>
-          <span class="chip"><span class="ic"></span>asyncpg</span>
-          <span class="chip"><span class="ic"></span>OpenAI Rate Limit</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=3.2">
-        <div class="row1">
-          <span class="ver">v3.2</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">PostgREST 제거 및 CTE 기반 쿼리 최적화</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>asyncpg</span>
-          <span class="chip"><span class="ic"></span>CTE</span>
-          <span class="chip"><span class="ic"></span>DB Connection Pooler</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=3.1">
-        <div class="row1">
-          <span class="ver">v3.1</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">Rule-worker Coroutine 적용 및 Auto Scaling 도입</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>Coroutine</span>
-          <span class="chip"><span class="ic"></span>Auto Scaling</span>
-          <span class="chip"><span class="ic"></span>DB Connection Pool</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=3.0">
-        <div class="row1">
-          <span class="ver">v3.0</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">Realtime 기반 이벤트 트리거 제거 및 Queue 기반 이벤트 처리 구조 도입</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>Supabase Realtime</span>
-          <span class="chip"><span class="ic"></span>SQS</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=2.0">
-        <div class="row1">
-          <span class="ver">v2.0</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">ECS Fargate 전환 및 Auto Scaling 적용</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>ECS</span>
-          <span class="chip"><span class="ic"></span>AWS Fargate</span>
-          <span class="chip"><span class="ic"></span>Auto Scaling</span>
-          <span class="chip"><span class="ic"></span>Supabase Realtime</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=1.1">
-        <div class="row1">
-          <span class="ver">v1.1</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">AI Worker 역할 분리 및 SQS 도입</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>SQS</span>
-          <span class="chip"><span class="ic"></span>Queue</span>
-        </div>
-      </a>
-
-      <a class="entry" href="template.html?v=1.0">
-        <div class="row1">
-          <span class="ver">v1.0</span>
-          <span class="status done">shipped</span>
-        </div>
-        <div class="title">빠른 구현을 위한 초기 아키텍처</div>
-        <div class="stack">
-          <span class="chip"><span class="ic"></span>Vercel</span>
-          <span class="chip"><span class="ic"></span>Supabase</span>
-          <span class="chip"><span class="ic"></span>EC2</span>
-        </div>
+      <a class="nav-card" href="results.html">
+        <div class="nav-label">final verification</div>
+        <div class="nav-title">최종 실험 결과</div>
+        <div class="nav-desc">최종 버전(v5.1)의 Soak Test 및 점진적 부하 테스트 결과입니다.</div>
+        <div class="nav-arrow">→</div>
       </a>
 
     </div>

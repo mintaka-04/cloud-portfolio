@@ -2,9 +2,9 @@ import { section, text, image, imageUrl, imageGrid, subLabel, badge, table, crit
 
 export default {
   version: 'v5.1',
-  title: '',
-  status: 'in progress',
-  tags: [],
+  title: 'Connection Pool 및 Task 수 조정을 통한 RDS Connection Capacity 확보',
+  status: 'shipped',
+  tags: ['DB Connection Pool', 'ECS Task Count', 'Soak Test'],
   prev: '5.0',
   next: null,
 
@@ -138,19 +138,40 @@ export default {
           ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-rds-db-connection-0812.png', 'RDS DB Connections 그래프')}
         `, 32)}
         <div style="margin-top:16px;">
+          ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-connection-monitor-0812.png', '0812 pg_stat_activity 기반 5초 단위 RDS Connection 모니터링 그래프')}
+        </div>
+        <div style="margin-top:16px;">
           ${text('RDS Connection은 5초 단위 모니터링 기준 최대 74(RDS 한도 79 중)까지 상승하였으며, 테스트 기간 동안 FATAL은 한 건도 발생하지 않았습니다.')}
         </div>
+        ${badge('queue 관련 cloudwatch 지표', `
+          ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-ai-queue-not-visible.png', 'ai-queue Approximate Number Of Messages Not Visible 그래프')}
+          <p class="body-text" style="margin-top:8px; text-align:center;">(ai-queue)</p>
+          ${imageUrl('../../assets/images/bottleneck_experiments/v12/v12-ai-queue-deleted.png', 'ai-queue Number Of Messages Deleted 그래프')}
+          <p class="body-text" style="margin-top:8px; text-align:center;">(ai-queue)</p>
+          <div style="margin-top:16px;">
+            ${text('ai-queue의 ApproximateNumberOfMessagesNotVisible은 테스트 중반까지 40~56 수준까지 증가하였다가, 14:42 이후 대부분 0에 가까운 수준으로 떨어졌습니다. 같은 시점부터 NumberOfMessagesDeleted 역시 분당 300~700건대에서 한 자릿수로 급감하였으며, 테스트 종료 시점까지 회복되지 않았습니다.')}
+          </div>
+        `, 32)}
       `)}
     `),
 
     // 05 판단 및 이유
     section(5, '판단 및 이유', `
-      ${text('')}
+      ${text([
+        'v5.0에서 Connection 고갈이 확인되었던 것과 동일한 조건(50 VU, 30분 유지)에서 FATAL이 2,576건에서 0건으로 감소하였다는 것을 통해 해당 테스트 동안 서비스별 Connection 사용량이 RDS Connection Capacity 내에서 안정적으로 유지되었다고 판단하였습니다. 또한 5초 단위 모니터링 기준 순간 최대 Connection은 74로 확인되었으며, 이는 RDS max_connections(79) 이내에서 발생한 값으로 테스트 기간 동안 Connection 고갈이 발생하지 않은 것을 확인할 수 있었습니다. 따라서 최종 구성에서는 기존에 발생했던 Connection 부족 문제를 해소하였다고 판단하였으며, 해당 테스트 조건에서 안정적으로 서비스를 처리할 수 있음을 확인하였습니다.',
+        '테스트 종료 후 사용했던 RDS Parameter Group을 재확인한 결과, superuser_reserved_connections = 3, rds.rds_reserved_connections = 4, reserved_connections = 2로 설정되어 있음을 확인하였습니다. 이를 단순 계산하면 max_connections = 79 중 일반 Connection에 해당하는 영역은 이론적으로 70개 수준이라고 판단할 수 있습니다.',
+        '다만 이는 각 예약 영역의 사용 권한과 실제 Connection 점유 상황을 반영한 애플리케이션의 정확한 사용 가능 범위를 의미하지 않으며, 테스트 당시에는 예약 영역별 실제 사용 가능 범위를 확인하지 못했기 때문에, 본 테스트에서는 해당 이론값을 기준으로 판단하기 보다 실제 부하 상황에서 관측된 Connection 사용량과 FATAL 발생 여부 및 발생 시점을 기준으로 Connection 여유를 판단하였습니다.',
+        '실험 설계의 2차 검증에서는 ai-worker와 rule-worker가 동시에 Auto Scaling 상한에 도달하면서 순간 Connection이 78에서 80까지 증가하고 FATAL이 발생하였으나, 최종 구성에서는 ai-worker의 Pool Max를 3에서 2로 축소하여 동일한 Task 구성에서 사용할 수 있는 Connection Budget을 추가로 낮추었습니다. 이에따라 최종 테스트에서는 순간 최대 Connection이 74까지 증가하였음에도 FATAL이 발생하지 않았으므로, 두 Worker가 동시에 Auto Scaling 상한에 도달하는 상황에서도 Connection 고갈 없이 처리할 수 있는 구성이 확보되었다고 판단하였습니다.',
+      ])}
+      ${text('또한 실험 결과에서 약 20분 이후 ai-queue의 NumberOfMessagesDeleted 및 ApproximateNumberOfMessagesNotVisible값이 감소하는 현상이 관측되었습니다. CloudWatch 로그를 추가적으로 확인한 결과, 해당 시점은 OpenAI RPD 소진에 의한 Rate Limit 에러가 지속적으로 발생하기 시작한 시점과 일치한다는 것을 확인했습니다. 또한 재확인 결과 이와 같은 현상이 1, 2차 검증 테스트 때에도 반복되었다는 것을 확인할 수 있었으며, 따라서 해당 현상은 Connection Budget 조정과는 무관한 현상이라고 판단하였습니다.')}
     `),
 
-    // 06 개선 방향
-    section(6, '개선 방향', `
-      ${text('')}
+    // 06 결론
+    section(6, '결론', `
+      ${text([
+        '이번 테스트에서 확인된 ai-queue 처리량 저하는 OpenAI API의 일일 요청 한도(RPD)에 따른 처리량 제약으로 판단하였습니다. 하지만 해당 문제에 대해서는 앞선 버전(<a href="template.html?v=4.1#section-06" style="color:var(--blue); text-decoration:underline;">v4.1</a>)에서 추가 비용을 투입하여 OpenAI 처리량을 높이지 않기로 결정하였으므로, 이를 개선하기 위한 별도의 다음 버전은 진행하지 않기로 하였습니다. 반면 5.1의 주요 개선 대상이었던 RDS Connection 고갈 문제는 Connection Pool 및 Task 수 조정을 통해 해소되었으며, 최종 검증에서도 FATAL이 발생하지 않는 것을 확인하였습니다.',
+        '따라서 프로젝트에 필요하다고 판단한 부하 테스트를 통해 주요 병목을 확인하고, 개선이 가능한 범위에 대한 조치와 검증을 완료하였다고 판단하여 5.1을 최종 버전으로 마무리하였습니다.',
+      ])}
     `),
   ]
 };
