@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Final Verification</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F6F2;
+    --grid:#C9D6E3;
+    --ink:#1B2430;
+    --ink-soft:#5B6675;
+    --accent:#FF5A1F;
+    --blue:#3B6EF0;
+    --line:#D7D2C5;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
+      var(--paper);
+    background-attachment: fixed;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+
+  .frame{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 120px;
+    position: relative;
+  }
+
+  .back{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+    margin-bottom: 28px;
+  }
+  .back:hover{ color: var(--accent); }
+
+  header{
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 18px;
+    margin-bottom: 8px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,90,31,.18);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse{ 50%{opacity:.4;} }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size: 34px;
+    letter-spacing: -0.01em;
+  }
+  .sub{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 14px 0 48px;
+    max-width: 520px;
+  }
+
+  .placeholder{
+    border: 1px dashed var(--line);
+    border-radius: 4px;
+    padding: 48px 24px;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+  <div class="frame">
+    <a class="back" href="index.html">← overview</a>
+    <header>
+      <div class="eyebrow"><span class="dot"></span>final verification</div>
+      <h1>최종 실험 결과</h1>
+    </header>
+    <p class="sub">최종 버전(v5.1)이 확정된 이후, Soak Test와 점진적 부하 테스트(load_0813)로 최종 아키텍처의 동작을 별도로 검증한 결과입니다.</p>
+
+    <div class="placeholder">작성 중입니다.</div>
+
+  </div>
+</body>
+</html>
