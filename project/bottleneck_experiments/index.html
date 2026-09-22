@@ -36,79 +36,220 @@
   }
 
   header{
-    border-bottom: 2px solid var(--ink);
     padding-bottom: 18px;
     margin-bottom: 8px;
   }
-  .eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: .12em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    display:flex; align-items:center; gap:8px;
-  }
-  .eyebrow .dot{
-    width:7px;height:7px;border-radius:50%;background:var(--accent);
-    box-shadow: 0 0 0 3px rgba(255,90,31,.18);
-    animation: pulse 1.8s infinite;
-  }
-  @keyframes pulse{ 50%{opacity:.4;} }
   h1{
     font-family:'Space Grotesk', sans-serif;
     font-weight:700;
-    font-size: 34px;
+    font-size: 30px;
     letter-spacing: -0.01em;
   }
-  .nav-grid{
-    display:grid;
-    gap: 16px;
+  .intro{
+    margin-top: 16px;
+    max-width: 560px;
+  }
+  .intro p{
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  .section-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+
+  .section{
+    margin-top: 44px;
+    padding-top: 26px;
+    border-top: 2px solid var(--ink);
+  }
+  .section.tight{
+    margin-top: 0;
+    padding-top: 20px;
+  }
+
+  /* ---- KPI strip: Experience / Project / Key Result ---- */
+  .kpi-strip{
+    display: grid;
+    grid-template-columns: 1fr;
     margin-top: 40px;
+    border-top: 2px solid var(--ink);
   }
-  .nav-card{
-    position: relative;
-    display:block;
-    padding: 24px 26px;
+  @media (min-width: 640px){
+    .kpi-strip{ grid-template-columns: 1fr 1fr 1.3fr; }
+  }
+  .kpi{
+    padding: 22px 0;
+  }
+  .kpi + .kpi{
+    border-top: 1px dashed var(--line);
+  }
+  @media (min-width: 640px){
+    .kpi{ padding: 22px 24px; }
+    .kpi:first-child{ padding-left: 0; }
+    .kpi + .kpi{ border-top: none; border-left: 1px dashed var(--line); }
+  }
+  .kpi-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .kpi-value{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+  .kpi-sub{
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .kpi.accent .kpi-value{
+    color: var(--accent);
+    font-size: 28px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .kpi.accent .kpi-value .arrow{
+    color: var(--ink-soft);
+    font-size: .6em;
+  }
+
+  .context-text{
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink-soft);
+    max-width: 620px;
+  }
+
+  /* ---- My Work widget ---- */
+  .widget{
     border: 1px solid var(--line);
-    border-radius: 4px;
     background: rgba(255,255,255,.5);
-    text-decoration:none;
-    color:inherit;
-    transition: border-color .15s, padding-left .18s ease;
   }
-  .nav-card:hover{
-    border-color: var(--accent);
-    padding-left: 34px;
+  .widget-head{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px dashed var(--line);
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
   }
-  .nav-card:hover .nav-title{ color: var(--accent); }
-  .nav-label{
+  .widget-head .tick{
+    width: 6px; height: 6px;
+    background: var(--accent);
+    flex: none;
+  }
+  .work-list{
+    list-style: none;
+  }
+  .work-list li{
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .work-list li + li{
+    border-top: 1px dashed var(--line);
+  }
+  .work-list li svg{
+    flex: none;
+    width: 13px;
+    height: 13px;
+    margin-top: 2px;
+  }
+  .work-list li svg path{
+    stroke: var(--blue);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ---- Explore dock ---- */
+  .dock{
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.4);
+  }
+  .dock-item{
+    flex: 1 1 240px;
+    position: relative;
+    padding: 22px 24px 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: background .15s ease;
+  }
+  .dock-item + .dock-item{
+    border-left: 1px dashed var(--line);
+  }
+  .dock-item:hover{
+    background: rgba(255,255,255,.85);
+  }
+  .dock-item:hover .dock-title{ color: var(--accent); }
+  .dock-item:hover .dock-icon path{ stroke: var(--accent); }
+  .dock-head{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .dock-icon{
+    width: 26px;
+    height: 26px;
+    flex: none;
+  }
+  .dock-icon path{
+    stroke: var(--ink);
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke .15s;
+  }
+  .dock-arrow{
+    font-family:'JetBrains Mono', monospace;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+  .dock-label{
     font-family:'JetBrains Mono', monospace;
     font-size: 11px;
     letter-spacing:.06em;
     color: var(--ink-soft);
     text-transform: uppercase;
+    margin-top: 14px;
   }
-  .nav-title{
+  .dock-title{
     font-family:'Space Grotesk', sans-serif;
-    font-weight:700;
-    font-size: 20px;
-    margin-top: 6px;
+    font-weight: 700;
+    font-size: 18px;
+    margin-top: 4px;
     transition: color .15s;
   }
-  .nav-desc{
-    font-size: 13.5px;
+  .dock-desc{
+    font-size: 13px;
+    line-height: 1.6;
     color: var(--ink-soft);
     margin-top: 8px;
-    max-width: 480px;
-  }
-  .nav-arrow{
-    position:absolute;
-    right: 26px; top: 50%;
-    transform: translateY(-50%);
-    font-family:'JetBrains Mono', monospace;
-    color: var(--ink-soft);
-    font-size: 18px;
   }
 
   footer{
@@ -125,36 +266,87 @@
 
   <div class="frame">
     <header>
-      <div class="eyebrow"><span class="dot"></span>cloud-portfolio</div>
-      <h1>부하 테스트를 통한 인프라 개선</h1>
+      <h1>Infrastructure / Performance</h1>
+      <div class="intro">
+        <p>서비스의 인프라와 성능 문제를 직접 확인하고<br>실험을 통해 개선한 경험을 정리했습니다.</p>
+      </div>
     </header>
 
-    <div class="nav-grid">
-
-      <a class="nav-card" href="log.html">
-        <div class="nav-label">engineering log</div>
-        <div class="nav-title">아키텍처 변경 기록</div>
-        <div class="nav-desc">버전(v1.0 ~ v5.1)마다 무엇을 바꿨고, 왜 그렇게 판단했는지를 그대로 남긴 기록입니다.</div>
-        <div class="nav-arrow">→</div>
-      </a>
-
-      <a class="nav-card" href="diagrams.html">
-        <div class="nav-label">visual history</div>
-        <div class="nav-title">아키텍처 변화</div>
-        <div class="nav-desc">텍스트 없이 다이어그램만으로 아키텍처가 어떻게 바뀌어왔는지 훑어봅니다.</div>
-        <div class="nav-arrow">→</div>
-      </a>
-
-      <!--
-      <a class="nav-card" href="results.html">
-        <div class="nav-label">final verification</div>
-        <div class="nav-title">최종 실험 결과</div>
-        <div class="nav-desc">최종 버전(v5.1)의 Soak Test 및 점진적 부하 테스트 결과입니다.</div>
-        <div class="nav-arrow">→</div>
-      </a>
-      -->
-
+    <div class="kpi-strip">
+      <div class="kpi">
+        <div class="kpi-label">Experience</div>
+        <div class="kpi-value">2년 8개월</div>
+        <div class="kpi-sub">Web Developer</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Project</div>
+        <div class="kpi-value">Moodot</div>
+        <div class="kpi-sub">3인 팀 · 개인 인프라/성능 개선 4개월</div>
+      </div>
+      <div class="kpi accent">
+        <div class="kpi-label">Key Result — RDS Connection 관련 FATAL Error</div>
+        <div class="kpi-value">2,576<span class="arrow">→</span>0</div>
+      </div>
     </div>
+
+    <section class="section tight">
+      <div class="section-label">Background</div>
+      <p class="context-text">웹 서비스 개발 및 솔루션 적용 업무를 2년 8개월간 수행했습니다.<br>Moodot은 기능 개발 이후 약 4개월간 인프라 및 성능 개선을 개인적으로 이어간 프로젝트입니다.</p>
+    </section>
+
+    <section class="section">
+      <div class="widget">
+        <div class="widget-head"><span class="tick"></span>My Work</div>
+        <ul class="work-list">
+          <li><svg viewBox="0 0 16 16"><path d="M3 8.5L6.5 12L13 4"/></svg>AWS 기반 인프라 구성 및 변경</li>
+          <li><svg viewBox="0 0 16 16"><path d="M3 8.5L6.5 12L13 4"/></svg>부하 테스트를 통한 병목 확인</li>
+          <li><svg viewBox="0 0 16 16"><path d="M3 8.5L6.5 12L13 4"/></svg>RDS Connection Capacity 문제 분석</li>
+          <li><svg viewBox="0 0 16 16"><path d="M3 8.5L6.5 12L13 4"/></svg>ECS Task 및 Connection Pool 조정</li>
+          <li><svg viewBox="0 0 16 16"><path d="M3 8.5L6.5 12L13 4"/></svg>최종 구조에 대한 성능 검증</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-label">Explore</div>
+      <div class="dock">
+
+        <a class="dock-item" href="diagrams.html">
+          <div class="dock-head">
+            <svg class="dock-icon" viewBox="0 0 30 30"><path d="M6 22V13L15 7L24 13V22"/><path d="M6 22H24"/><path d="M11 22V16H19V22"/></svg>
+            <span class="dock-arrow">→</span>
+          </div>
+          <div class="dock-label">visual history</div>
+          <div class="dock-title">Architecture</div>
+          <div class="dock-desc">버전별 아키텍처가 어떻게 바뀌어왔는지 다이어그램으로 훑어봅니다.</div>
+        </a>
+
+        <a class="dock-item" href="log.html">
+          <div class="dock-head">
+            <svg class="dock-icon" viewBox="0 0 30 30"><path d="M12 5H18"/><path d="M13.5 5V12L8 22C7.4 23 8 24 9 24H21C22 24 22.6 23 22 22L16.5 12V5"/></svg>
+            <span class="dock-arrow">→</span>
+          </div>
+          <div class="dock-label">engineering log</div>
+          <div class="dock-title">Bottleneck Experiments</div>
+          <div class="dock-desc">문제 발생부터 원인 분석, 실험 및 개선 과정을 버전(v1.0 ~ v5.1)별로 남긴 기록입니다.</div>
+        </a>
+
+        <!--
+        <a class="dock-item" href="results.html">
+          <div class="dock-head">
+            <svg class="dock-icon" viewBox="0 0 30 30"><path d="M8 25V5"/><path d="M8 25H24"/><path d="M12 20V14"/><path d="M17 20V10"/><path d="M22 20V16"/></svg>
+            <span class="dock-arrow">→</span>
+          </div>
+          <div class="dock-label">final verification</div>
+          <div class="dock-title">Final Validation</div>
+          <div class="dock-desc">최종 구조에 대한 부하 테스트 및 Soak Test 결과입니다.</div>
+        </a>
+        -->
+
+      </div>
+    </section>
+
+    <footer>cloud-portfolio / bottleneck-experiments</footer>
 
   </div>
 </body>
