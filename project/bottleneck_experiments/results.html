@@ -2,105 +2,269 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Final Verification</title>
+<title>Final Validation</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="common.css">
 <style>
-  :root{
-    --paper:#F7F6F2;
-    --grid:#C9D6E3;
-    --ink:#1B2430;
-    --ink-soft:#5B6675;
-    --accent:#FF5A1F;
-    --blue:#3B6EF0;
-    --line:#D7D2C5;
+  /* ---- Verdict banner ---- */
+  .verdict{
+    margin-top: 24px;
+    border: 1px solid var(--ink);
+    background: rgba(255,255,255,.5);
+    padding: 18px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background:
-      linear-gradient(rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(201,214,227,.45) 1px, transparent 1px) 0 0 / 32px 32px,
-      var(--paper);
-    background-attachment: fixed;
-    color:var(--ink);
-    font-family:'Inter', sans-serif;
-    min-height:100vh;
+  .verdict-icon{ flex: none; width: 26px; height: 26px; margin-top: 1px; }
+  .verdict-icon circle{ stroke: var(--accent); stroke-width: 1.6; fill: none; }
+  .verdict-icon path{ stroke: var(--accent); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .verdict-title{
+    font-family:'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px;
+    color: var(--ink); margin-bottom: 6px; line-height: 1.5;
   }
+  .verdict-sub{ font-size: 12.5px; color: var(--ink-soft); line-height: 1.6; }
 
-  .frame{
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 56px 24px 120px;
-    position: relative;
+  /* ---- KPI grid ---- */
+  .kpi-grid{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: 24px;
   }
+  @media (min-width: 620px){
+    .kpi-grid{ grid-template-columns: repeat(3, 1fr); }
+  }
+  .kpi-cell{ background: rgba(247,246,242,.9); padding: 16px 18px 18px; }
+  .kpi-cell .kpi-label{
+    font-family:'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing:.06em;
+    text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; line-height: 1.5;
+  }
+  .kpi-cell .kpi-value{
+    font-family:'Space Grotesk', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.15; margin-bottom: 4px;
+  }
+  .kpi-cell .kpi-value .arrow{ color: var(--ink-soft); font-size: .7em; margin: 0 4px; }
+  .kpi-cell.hero-stat .kpi-value{ color: var(--accent); }
+  .kpi-cell .kpi-note{ font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
+  .kpi-cell .kpi-note a{ color: var(--blue); }
 
-  .back{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--ink-soft);
-    text-decoration:none;
-    display:inline-flex; align-items:center; gap:6px;
-    margin-bottom: 28px;
+  /* ---- Before / After table ---- */
+  .ba-table{ width: 100%; margin-top: 18px; border-collapse: collapse; font-size: 13px; }
+  .ba-table th{
+    text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line);
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.04em;
+    text-transform: uppercase; color: var(--ink-soft); font-weight: 500;
   }
-  .back:hover{ color: var(--accent); }
+  .ba-table td{ padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.5; }
+  .ba-table td.arrow-col{ text-align: center; color: var(--ink-soft); width: 24px; }
+  .ba-table td.item{ font-family:'Space Grotesk', sans-serif; font-weight: 700; }
+  .ba-table td.after{ color: var(--ink); font-weight: 500; background: rgba(247,246,242,.6); }
 
-  header{
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 18px;
-    margin-bottom: 8px;
+  /* ---- Collapsible detail ---- */
+  details.raw{
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.4);
+    margin-top: 14px;
   }
-  .eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: .12em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    display:flex; align-items:center; gap:8px;
-  }
-  .eyebrow .dot{
-    width:7px;height:7px;border-radius:50%;background:var(--accent);
-    box-shadow: 0 0 0 3px rgba(255,90,31,.18);
-    animation: pulse 1.8s infinite;
-  }
-  @keyframes pulse{ 50%{opacity:.4;} }
-  h1{
-    font-family:'Space Grotesk', sans-serif;
-    font-weight:700;
-    font-size: 34px;
-    letter-spacing: -0.01em;
-  }
-  .sub{
-    font-size: 14px;
-    color: var(--ink-soft);
-    margin: 14px 0 48px;
-    max-width: 520px;
-  }
-
-  .placeholder{
-    border: 1px dashed var(--line);
-    border-radius: 4px;
-    padding: 48px 24px;
-    text-align:center;
+  details.raw summary{
+    cursor: pointer;
+    list-style: none;
+    padding: 13px 18px;
     font-family:'JetBrains Mono', monospace;
     font-size: 12.5px;
+    font-weight: 500;
     color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  details.raw summary::-webkit-details-marker{ display: none; }
+  details.raw summary::before{ content: "▸"; color: var(--accent); transition: transform .15s ease; }
+  details.raw[open] summary::before{ transform: rotate(90deg); }
+  details.raw summary:hover{ color: var(--ink); }
+  .raw-body{
+    padding: 4px 18px 20px;
+    border-top: 1px dashed var(--line);
+  }
+  .raw-body .body-text + .body-text{ margin-top: 10px; }
+
+  footer{
+    margin-top: 48px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    border-top: 1px dashed var(--line);
+    padding-top: 18px;
   }
 </style>
 </head>
 <body>
-
   <div class="frame">
     <a class="back" href="index.html">← overview</a>
     <header>
-      <div class="eyebrow"><span class="dot"></span>final verification</div>
-      <h1>최종 실험 결과</h1>
+      <div class="eyebrow live"><span class="dot"></span>final verification</div>
+      <h1>최종 구조 검증</h1>
     </header>
-    <p class="sub">최종 버전(v5.1)이 확정된 이후, Soak Test와 점진적 부하 테스트(load_0813)로 최종 아키텍처의 동작을 별도로 검증한 결과입니다.</p>
+    <p class="body-text" style="margin-top:14px; color:var(--ink-soft); max-width:58ch;">v5.1에서 확정된 최종 구성에 대해, 기존 표준 부하 조건을 적용한 최종 검증 결과입니다.</p>
 
-    <div class="placeholder">작성 중입니다.</div>
+    <div class="verdict">
+      <svg class="verdict-icon" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11.5"/><path d="M7.5 13.5L11 17L18.5 8.5"/></svg>
+      <div>
+        <div class="verdict-title">최종 구조(v5.1) 검증 완료 — 표준 부하 요청 오류율 0% · Soak Test DB Connection FATAL 0건</div>
+        <div class="verdict-sub">v1.0부터 사용해온 점진적 부하 테스트(VU 10 → 30 → 50 → 100, 14.5분)를 최종 구성(rule-worker Task 9 / Pool 4, ai-worker Task 9 / Pool 2)에서 재수행한 결과입니다.</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-cell hero-stat">
+        <div class="kpi-label">DB Connection FATAL Error</div>
+        <div class="kpi-value">2,576<span class="arrow">→</span>0</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">최대 동시 Connection (Soak 50VU·30분)</div>
+        <div class="kpi-value">74<span class="arrow">/</span>79</div>
+        <div class="kpi-note">표준 부하 테스트(14.5분) 중에는 7~40 수준</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Worker Auto Scaling</div>
+        <div class="kpi-value">1<span class="arrow">→</span>9</div>
+        <div class="kpi-note">Task 자동 조정, Scale-in/out 반복 없음</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">표준 부하 테스트 · 10~100 VU (14.5분)</div>
+        <div class="kpi-value">0%</div>
+        <div class="kpi-note">총 29,288건 요청, checks 통과율 100%</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Soak Test · 50 VU (30분 유지)</div>
+        <div class="kpi-value">재현 없음</div>
+        <div class="kpi-note">v5.0에서 발생했던 Connection 고갈 미재현</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">ai-queue 지연</div>
+        <div class="kpi-value">Rate Limit 기인</div>
+        <div class="kpi-note">DB Connection 문제와 무관한 별개 제약</div>
+      </div>
+    </div>
+
+    <section>
+      <div class="sub-label" style="margin-top:0;">Before → After</div>
+      <table class="ba-table">
+        <thead><tr><th>항목</th><th>문제 확인 시점</th><th></th><th>최종 구조</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="item">50 VU 부하 (v1.0)</td>
+            <td>임계점 진입 (응답시간·CPU 상승 시작)</td>
+            <td class="arrow-col">→</td>
+            <td class="after">다른 VU 구간과 동일 수준 유지 (avg 861ms)</td>
+          </tr>
+          <tr>
+            <td class="item">100 VU 부하 / SSM 접속 (v1.0)</td>
+            <td>CPU 99%, SSM 접속 불가</td>
+            <td class="arrow-col">→</td>
+            <td class="after">SSM 접속 구조 자체 없음(ECS Fargate), 요청 처리 에러 0%</td>
+          </tr>
+          <tr>
+            <td class="item">DB Connection (v5.0)</td>
+            <td>FATAL 2,576건 / 30분</td>
+            <td class="arrow-col">→</td>
+            <td class="after">FATAL 0건, 최대 74/79</td>
+          </tr>
+          <tr>
+            <td class="item">Worker Scaling (v1.0~v1.1)</td>
+            <td>단일 Worker 중심 처리</td>
+            <td class="arrow-col">→</td>
+            <td class="after">Auto Scaling으로 Task 1 → 9 자동 조정</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <div class="sub-label">rule-worker CPU Utilization</div>
+      <div class="placeholder has-image">
+        <img src="../../assets/images/bottleneck_experiments/final/gradual_test-rule_worker-cpu.png" alt="rule-worker CPU Utilization 그래프 (점진적 부하 테스트)" style="width:100%; display:block;">
+      </div>
+      <p class="body-text" style="margin-top:10px; font-size:13px; color:var(--ink-soft);">Scale-out 직전 일시적으로 100%에 도달한 뒤 Task 증가와 함께 즉시 감소 — v4.3과 동일한 패턴이며, Scale-out/Scale-in 반복은 발생하지 않았습니다.</p>
+    </section>
+
+    <section>
+      <div class="sub-label">Detail</div>
+
+      <details class="raw">
+        <summary>검증 조건 보기</summary>
+        <div class="raw-body">
+          <p class="body-text">v1.0부터 사용해온 것과 동일한 점진적 부하 테스트(k6, <code>gradual.js</code>, VU 10 → 30 → 50 → 100, 각 3분 유지, 총 14.5분)를 v5.1에서 확정된 최종 구성(rule-worker Task 9 / Pool 4, ai-worker Task 9 / Pool 2)에서 다시 수행했습니다.</p>
+          <p class="body-text">RDS Connection 관련 동작은 이미 v5.1의 Soak Test(50 VU, 30분 유지)에서 확인되었습니다. 이번 테스트에서는 표준 부하 조건에서의 요청 처리 결과와 Worker Auto Scaling 상태를 확인했습니다.</p>
+        </div>
+      </details>
+
+      <details class="raw">
+        <summary>VU별 응답 시간 원본 데이터</summary>
+        <div class="raw-body">
+          <p class="body-text">베이스라인(1회차 cold start 제외, 2~10회 평균): avg 0.92s · p95 1.17s · 에러율 0%</p>
+          <table style="margin-top:10px;">
+            <thead><tr><th>VU</th><th>avg</th><th>p95</th></tr></thead>
+            <tbody>
+              <tr><td>10</td><td class="num-val">901ms</td><td class="num-val">1,432ms</td></tr>
+              <tr><td>30</td><td class="num-val">866ms</td><td class="num-val">1,279ms</td></tr>
+              <tr><td>50</td><td class="num-val">861ms</td><td class="num-val">1,230ms</td></tr>
+              <tr><td>100</td><td class="num-val">866ms</td><td class="num-val">1,301ms</td></tr>
+            </tbody>
+          </table>
+          <p class="body-text" style="margin-top:10px;">총 요청 수 29,288건 (14,644 iteration), checks 통과율 100%, 에러율 0%</p>
+        </div>
+      </details>
+
+      <details class="raw">
+        <summary>Auto Scaling 이벤트 타임라인</summary>
+        <div class="raw-body">
+          <table>
+            <thead><tr><th>시간</th><th>서비스</th><th>Desired Count</th></tr></thead>
+            <tbody>
+              <tr><td>15:23 ~ 15:24</td><td>ai-worker</td><td class="num-val">1 → 4</td></tr>
+              <tr><td>15:25 ~ 15:26</td><td>rule-worker</td><td class="num-val">1 → 4</td></tr>
+              <tr><td>15:25 ~ 15:26</td><td>ai-worker</td><td class="num-val">4 → 7</td></tr>
+              <tr><td>15:28 ~ 15:29</td><td>rule-worker</td><td class="num-val">4 → 7</td></tr>
+              <tr><td>15:28 ~ 15:29</td><td>ai-worker</td><td class="num-val">7 → 9 (최대)</td></tr>
+              <tr><td>15:31 ~ 15:32</td><td>rule-worker</td><td class="num-val">7 → 9 (최대)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details class="raw">
+        <summary>시스템 상태 (RDS / ai-queue)</summary>
+        <div class="raw-body">
+          <p class="body-text"><strong>RDS Connection</strong> — DatabaseConnections 7~40 수준 (max_connections 79). CPU 3.1~23.6%, Write/Read Latency 0.00x초대, Write/Read IOPS 낮은 수준, DiskQueueDepth 0.001~0.103 유지. v5.0에서는 50 VU 부하를 30분간 유지했을 때 Connection 고갈이 발생했으나, 이번 14.5분 테스트에서는 재현되지 않았습니다.</p>
+          <p class="body-text"><strong>ai-queue</strong> — Visible 메시지 최대 11,227건, Oldest Message 최대 513초. v4.1 / v5.1에서 확인된 OpenAI API Rate Limit(RPD)에 따른 처리량 제약과 동일한 패턴이며, 애플리케이션 내부 DB Connection 문제와는 별개의 제약입니다.</p>
+        </div>
+      </details>
+    </section>
+
+    <footer>cloud-portfolio / bottleneck-experiments / final-validation</footer>
 
   </div>
+
+  <div class="lightbox-overlay" id="lightbox"><img id="lightbox-img" alt=""></div>
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    document.querySelector('.frame').addEventListener('click', e => {
+      const img = e.target.closest('.placeholder.has-image img');
+      if (!img) return;
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightbox.classList.add('open');
+    });
+    lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') lightbox.classList.remove('open');
+    });
+  </script>
 </body>
 </html>

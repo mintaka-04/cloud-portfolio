@@ -56,11 +56,10 @@
   }
 
   .section-label{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--ink);
     margin-bottom: 16px;
   }
 
@@ -73,12 +72,15 @@
     margin-top: 0;
     padding-top: 20px;
   }
+  .section.plain{
+    border-top: none;
+  }
 
   /* ---- KPI strip: Experience / Project / Key Result ---- */
   .kpi-strip{
     display: grid;
     grid-template-columns: 1fr;
-    margin-top: 40px;
+    margin-top: 20px;
     border-top: 2px solid var(--ink);
   }
   @media (min-width: 640px){
@@ -157,9 +159,10 @@
   }
   .work-list{
     list-style: none;
+    padding: 4px 22px;
   }
   .work-list li{
-    padding: 12px 16px;
+    padding: 12px 0;
     display: flex;
     align-items: flex-start;
     gap: 9px;
@@ -168,7 +171,7 @@
     color: var(--ink-soft);
   }
   .work-list li + li{
-    border-top: 1px dashed var(--line);
+    border-top: 1px solid var(--line);
   }
   .work-list li svg{
     flex: none;
@@ -294,7 +297,7 @@
       <p class="context-text">웹 서비스 개발 및 솔루션 적용 업무를 2년 8개월간 수행했습니다.<br>Moodot은 기능 개발 이후 약 4개월간 인프라 및 성능 개선을 개인적으로 이어간 프로젝트입니다.</p>
     </section>
 
-    <section class="section">
+    <section class="section plain">
       <div class="widget">
         <div class="widget-head"><span class="tick"></span>My Work</div>
         <ul class="work-list">
@@ -307,7 +310,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section plain">
       <div class="section-label">Explore</div>
       <div class="dock">
 
@@ -331,7 +334,6 @@
           <div class="dock-desc">문제 발생부터 원인 분석, 실험 및 개선 과정을 버전(v1.0 ~ v5.1)별로 남긴 기록입니다.</div>
         </a>
 
-        <!--
         <a class="dock-item" href="results.html">
           <div class="dock-head">
             <svg class="dock-icon" viewBox="0 0 30 30"><path d="M8 25V5"/><path d="M8 25H24"/><path d="M12 20V14"/><path d="M17 20V10"/><path d="M22 20V16"/></svg>
@@ -341,7 +343,6 @@
           <div class="dock-title">Final Validation</div>
           <div class="dock-desc">최종 구조에 대한 부하 테스트 및 Soak Test 결과입니다.</div>
         </a>
-        -->
 
       </div>
     </section>
