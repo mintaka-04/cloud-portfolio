@@ -12,7 +12,16 @@ export default {
 
     // 01 아키텍처
     section(1, '아키텍처', `
-      ${text('rule-worker의 Auto Scaling 정책을 동일한 SQS NumberOfMessagesSent 지표 기반으로 재구성하여 Scale-out과 Scale-in이 동일한 기준으로 동작하도록 변경하였습니다.')}
+      ${text('rule-worker의 Scale-in 정책 기준을 ApproximateNumberOfMessagesVisible에서 NumberOfMessagesSent로 변경하여, v4.2에서 추가한 Sent 기반 Scale-out 정책과 같은 지표로 동작하도록 하였습니다. 기존 Visible 기반 Scale-out 정책은 유지하였습니다.')}
+      ${table({
+        head: ['버전', 'Scale-out', 'Scale-in'],
+        rows: [
+          { cells: ['v4.0', 'Visible', 'Visible'] },
+          { cells: ['v4.1', 'Visible + CPU Utilization', 'Visible'] },
+          { cells: ['v4.2', 'Visible + Sent', 'Visible'] },
+          { cells: ['v4.3', 'Visible + Sent', 'Sent'], highlight: true },
+        ]
+      })}
     `),
 
     // 02 개선 배경
@@ -24,7 +33,7 @@ export default {
       <div style="margin-top:20px;">
         ${imageUrl('../../assets/images/bottleneck_experiments/v9/v9-event-queue-visible.png', 'event-queue Visible 그래프')}
       </div>
-      <p class="body-text" style="margin-top:12px;">Scale-out 기준으로 사용한 NumberOfMessagesSent는 메시지 유입량을 직접 반영하여 부하 증가를 빠르게 감지할 수 있었지만, Scale-in 기준으로 사용한 ApproximateNumberOfMessagesVisible은 부하 테스트 동안 대부분 낮은 수준으로 유지되어, 메시지 적체 여부를 판단하는 기준으로 활용하기 어려웠습니다. 따라서 부하 증가와 감소를 동일한 기준으로 판단할 수 있도록 Scale-out과 Scale-in 모두 NumberOfMessagesSent를 기준으로 구성하였습니다. 또한 Scale-out과 Scale-in 조건이 동시에 만족되지 않도록 기준값 사이에 차이를 두었으며, 불필요한 축소로 인한 Desired Count 변동을 최소화하기 위해 Scale-in 기준을 Scale-out 기준보다 낮게 설정하였습니다.</p>
+      <p class="body-text" style="margin-top:12px;">Scale-out 기준으로 사용한 NumberOfMessagesSent는 메시지 유입량을 직접 반영하여 부하 증가를 빠르게 감지할 수 있었지만, Scale-in 기준으로 사용한 ApproximateNumberOfMessagesVisible은 부하 테스트 동안 대부분 낮은 수준으로 유지되어, 메시지 적체 여부를 판단하는 기준으로 활용하기 어려웠습니다. 따라서 부하 증가와 감소를 동일한 기준으로 판단할 수 있도록 Scale-in 기준도 Scale-out에 추가한 NumberOfMessagesSent로 맞추었습니다. 또한 Scale-out과 Scale-in 조건이 동시에 만족되지 않도록 기준값 사이에 차이를 두었으며, 불필요한 축소로 인한 Desired Count 변동을 최소화하기 위해 Scale-in 기준을 Scale-out 기준보다 낮게 설정하였습니다.</p>
     `),
 
     // 03 실험 설계

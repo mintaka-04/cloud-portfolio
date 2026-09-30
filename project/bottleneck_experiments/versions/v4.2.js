@@ -12,7 +12,15 @@ export default {
 
     // 01 아키텍처
     section(1, '아키텍처', `
-      ${text('rule-worker의 Auto Scaling 정책 중 CPU Utilization 기반 정책을 제거하고, SQS NumberOfMessagesSent 기반 정책을 추가하였습니다.')}
+      ${text('rule-worker의 Auto Scaling 정책 중 CPU Utilization 기반 Scale-out 정책을 제거하고, SQS NumberOfMessagesSent 기반 Scale-out 정책을 추가하였습니다. 기존 Visible 기반 Scale-out, Scale-in 정책은 유지하였습니다.')}
+      ${table({
+        head: ['버전', 'Scale-out', 'Scale-in'],
+        rows: [
+          { cells: ['v4.0', 'Visible', 'Visible'] },
+          { cells: ['v4.1', 'Visible + CPU Utilization', 'Visible'] },
+          { cells: ['v4.2', 'Visible + Sent', 'Visible'], highlight: true },
+        ]
+      })}
     `),
 
     // 02 개선 배경
